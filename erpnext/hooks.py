@@ -229,6 +229,9 @@ doc_events = {
 	"Contact":{
 		"on_trash": "erpnext.support.doctype.issue.issue.update_issue"
 	}
+	"Issue":{
+		"on_update": "erpnext.support.doctype.issue.issue.check_agreement_status"
+	}
 }
 
 scheduler_events = {

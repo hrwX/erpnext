@@ -265,17 +265,23 @@ def update_issue(contact, method):
 	"""Called when Contact is deleted"""
 	frappe.db.sql("""UPDATE `tabIssue` set contact='' where contact=%s""", contact.name)
 
-def update_support_timer():
-	issues = frappe.get_list("Issue", filters={"status": "Open"}, order_by="creation DESC")
+def update_agreement_status():
+	"""Update Agreement Status if Agreement Exists"""
+	issues = frappe.get_list("Issue", filters={"status": "Open"}, fields={"name", "service_level_agreement"}, order_by="creation DESC")
 	for issue in issues:
-		issue = frappe.get_doc("Issue", issue.name)
+		if issue.service_level_agreement:
+			issue = frappe.get_doc("Issue", issue.name)
+			if round(time_diff_in_hours(issue.response_by, now_datetime()), 2) < 0 or round(time_diff_in_hours(issue.resolution_by, now_datetime()), 2) < 0:
+				issue.agreement_status = "Failed"
+				issue.save()
 
+def check_agreement_status(doc, method):
+	"""Check Agreeent Status if status is changed to Closed"""
+	if doc.service_level_agreement and doc.status == "Closed":
 		if round(time_diff_in_hours(issue.response_by, now_datetime()), 2) < 0 or round(time_diff_in_hours(issue.resolution_by, now_datetime()), 2) < 0:
-			issue.agreement_status = "Failed"
+			doc.agreement_status = "Failed"
 		else:
-			issue.agreement_status = "Fulfilled"
-		issue.save()
-
+			doc.agreement_status = "Fulfilled"
 
 def get_holidays(holiday_list_name):
 	holiday_list = frappe.get_cached_doc("Holiday List", holiday_list_name)

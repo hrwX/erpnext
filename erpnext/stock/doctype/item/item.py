@@ -486,17 +486,21 @@ class Item(WebsiteGenerator):
 		[self.remove(d) for d in to_remove]
 
 	def update_show_in_website(self):
+		doc = self.get_doc_before_save()
+
 		if self.disabled:
 			self.show_in_website = False
 
-		variants = frappe.get_all("Item", filters={"variant_of": self.name}, fields=["item_code"])
+		elif not self.disabled and self.has_variants and not self.show_in_website and not self.show_in_website == doc.show_in_website:
+			variants = frappe.get_all("Item", filters={"variant_of": self.name}, fields=["item_code"])
 
-		if not self.disabled and self.has_variants and not self.show_in_website and variants:
-			frappe.db.sql("""
-				UPDATE `tabItem`
-				SET show_variant_in_website=0
-				WHERE variant_of=%s
-			""", (self.name))
+			if not variants:
+				return
+
+			if len(variants) <= 30:
+				hide_variants(variants)
+			else:
+				frappe.enqueue("erpnext.stock.doctype.item.item.hide_variants", variants=variants, timeout=600)
 
 	def update_template_tables(self):
 		template = frappe.get_doc("Item", self.variant_of)
@@ -1143,6 +1147,13 @@ def update_variants(variants, template, publish_progress=True):
 		count+=1
 		if publish_progress:
 				frappe.publish_progress(count*100/len(variants), title = _("Updating Variants..."))
+
+def hide_variants(variants):
+
+	for item in variants:
+		item_doc = frappe.get_doc("Item", item.get("item_code"))
+		item_doc.show_variant_in_website = False
+		item_doc.save()
 
 def on_doctype_update():
 	# since route is a Text column, it needs a length for indexing

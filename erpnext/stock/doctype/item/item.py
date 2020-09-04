@@ -489,6 +489,15 @@ class Item(WebsiteGenerator):
 		if self.disabled:
 			self.show_in_website = False
 
+		variants = frappe.get_all("Item", filters={"variant_of": self.name}, fields=["item_code"])
+
+		if not self.disabled and self.has_variants and not self.show_in_website and variants:
+			frappe.db.sql("""
+				UPDATE `tabItem`
+				SET show_variant_in_website=0
+				WHERE variant_of=%s
+			""", (self.name))
+
 	def update_template_tables(self):
 		template = frappe.get_doc("Item", self.variant_of)
 

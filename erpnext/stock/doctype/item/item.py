@@ -490,7 +490,7 @@ class Item(WebsiteGenerator):
 		if self.disabled:
 			self.show_in_website = False
 
-		elif self.has_variants and not self.show_in_website and not self.show_in_website == show_in_website:
+		elif self.has_variants and self.show_in_website != show_in_website:
 			variants = frappe.get_all("Item", filters={"variant_of": self.name}, fields=["item_code"])
 
 			if variants:

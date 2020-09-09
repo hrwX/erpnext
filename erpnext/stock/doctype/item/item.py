@@ -485,8 +485,16 @@ class Item(WebsiteGenerator):
 		[self.remove(d) for d in to_remove]
 
 	def update_show_in_website(self):
+		show_in_website = frappe.db.get_value("Item", self.name, "show_in_website")
+
 		if self.disabled:
 			self.show_in_website = False
+
+		elif self.has_variants and not self.show_in_website and not self.show_in_website == show_in_website:
+			variants = frappe.get_all("Item", filters={"variant_of": self.name}, fields=["item_code"])
+
+			if variants:
+				frappe.enqueue("erpnext.stock.doctype.item.item.hide_variants", variants=variants, timeout=600)
 
 	def update_template_tables(self):
 		template = frappe.get_doc("Item", self.variant_of)
@@ -710,23 +718,6 @@ class Item(WebsiteGenerator):
 				set description = %s
 				where item_code = %s and docstatus < 2
 			""", (self.description, self.name))
-
-	def update_template_item(self):
-		"""Set Show in Website for Template Item if True for its Variant"""
-		if self.variant_of:
-			if self.show_in_website:
-				self.show_variant_in_website = 1
-				self.show_in_website = 0
-
-			if self.show_variant_in_website:
-				# show template
-				template_item = frappe.get_doc("Item", self.variant_of)
-
-				if not template_item.show_in_website:
-					template_item.show_in_website = 1
-					template_item.flags.dont_update_variants = True
-					template_item.flags.ignore_permissions = True
-					template_item.save()
 
 	def validate_item_defaults(self):
 		companies = list(set([row.company for row in self.item_defaults]))
@@ -1133,6 +1124,13 @@ def update_variants(variants, template, publish_progress=True):
 		count+=1
 		if publish_progress:
 				frappe.publish_progress(count*100/len(variants), title = _("Updating Variants..."))
+
+def hide_variants(variants):
+
+	for item in variants:
+		item_doc = frappe.get_doc("Item", item.get("item_code"))
+		item_doc.show_variant_in_website = False
+		item_doc.save()
 
 def on_doctype_update():
 	# since route is a Text column, it needs a length for indexing

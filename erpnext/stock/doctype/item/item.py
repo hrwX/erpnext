@@ -138,6 +138,7 @@ class Item(WebsiteGenerator):
 		self.validate_name_with_item_group()
 		self.update_variants()
 		self.update_item_price()
+		self.update_variants_website_display()
 
 	def validate_description(self):
 		'''Clean HTML description if set'''
@@ -485,16 +486,12 @@ class Item(WebsiteGenerator):
 		[self.remove(d) for d in to_remove]
 
 	def update_show_in_website(self):
-		show_in_website = frappe.db.get_value("Item", self.name, "show_in_website")
-
 		if self.disabled:
 			self.show_in_website = False
 
-		elif self.has_variants and self.show_in_website != show_in_website:
-			variants = frappe.get_all("Item", filters={"variant_of": self.name}, fields=["item_code"])
-
-			if variants:
-				frappe.enqueue("erpnext.stock.doctype.item.item.hide_variants", variants=variants, timeout=600)
+	def update_variants_website_display(self):
+		if self.has_variants:
+			frappe.enqueue(toggle_variants_website_display, item_name=self.name, value=self.show_in_website if not self.disabled else False, timeout=600)
 
 	def update_template_tables(self):
 		template = frappe.get_doc("Item", self.variant_of)
@@ -1125,11 +1122,11 @@ def update_variants(variants, template, publish_progress=True):
 		if publish_progress:
 				frappe.publish_progress(count*100/len(variants), title = _("Updating Variants..."))
 
-def hide_variants(variants):
+def toggle_variants_website_display(item_name, value):
 
-	for item in variants:
+	for item in frappe.get_all("Item", filters={"variant_of": item_name}, fields=["item_code"]):
 		item_doc = frappe.get_doc("Item", item.get("item_code"))
-		item_doc.show_variant_in_website = False
+		item_doc.show_variant_in_website = value
 		item_doc.save()
 
 def on_doctype_update():

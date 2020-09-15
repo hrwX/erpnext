@@ -10,6 +10,7 @@ from frappe.contacts.address_and_contact import load_address_and_contact, delete
 from erpnext.utilities.transaction_base import TransactionBase
 from erpnext.accounts.party import validate_party_accounts, get_dashboard_info, get_timeline_data # keep this
 from frappe.model.mapper import get_mapped_doc
+from erpnext.setup.doctype.company.company import validate_default_license, validate_expired_licenses
 
 
 class Supplier(TransactionBase):
@@ -50,6 +51,8 @@ class Supplier(TransactionBase):
 				msgprint(_("Series is mandatory"), raise_exception=1)
 
 		validate_party_accounts(self)
+		validate_default_license(self)
+		validate_expired_licenses(self)
 
 	def on_trash(self):
 		delete_contact_and_address('Supplier', self.name)

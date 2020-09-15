@@ -12,6 +12,7 @@ from frappe import _
 from frappe.contacts.doctype.address.address import get_address_display
 from frappe.model.document import Document
 from frappe.utils import cint, flt, get_datetime, get_link_to_form, nowdate, today
+from requests.utils import quote
 
 
 class DeliveryTrip(Document):
@@ -27,6 +28,8 @@ class DeliveryTrip(Document):
 		self.validate_stop_addresses()
 		self.update_status()
 		self.update_package_total()
+		self.generate_directions_url()
+		self.link_invoice_against_trip()
 
 	def on_submit(self):
 		self.update_status()
@@ -34,6 +37,7 @@ class DeliveryTrip(Document):
 
 	def on_update_after_submit(self):
 		self.update_status()
+		self.set_vehicle_last_odometer_value()
 
 	def on_cancel(self):
 		self.update_status()
@@ -251,6 +255,40 @@ class DeliveryTrip(Document):
 			frappe.throw(_(str(e)))
 
 		return directions[0] if directions else False
+
+	def generate_directions_url(self):
+		if not frappe.db.get_single_value("Google Settings", "enable") or not self.driver_address or not self.delivery_stops:
+			return
+
+		route_list = self.form_route_list(optimize=False)
+		if not route_list:
+			return
+
+		route_list = route_list[0]
+
+		context = {
+			"key": frappe.db.get_single_value("Google Settings", "api_key"),
+			"origin": quote(route_list[0], safe=''),
+			"destination": quote(route_list[-1], safe=''),
+			"waypoints": quote('|'.join(route_list[1:-1]), safe='')
+		}
+
+		self.map_embed = frappe.render_template("templates/includes/google_maps_embed.html", context)
+
+	def link_invoice_against_trip(self):
+		for delivery_stop in self.delivery_stops:
+			if delivery_stop.delivery_note:
+				sales_invoice = frappe.get_all("Delivery Note Item", filters={
+					"docstatus":1,
+					"parent": delivery_stop.delivery_note
+				}, fields=["distinct(against_sales_invoice)"])
+
+				if sales_invoice and len(sales_invoice)==1:
+					delivery_stop.sales_invoice = sales_invoice[0].against_sales_invoice
+
+	def set_vehicle_last_odometer_value(self):
+		if self.actual_distance_travelled:
+			frappe.db.set_value('Vehicle', self.vehicle, 'last_odometer', self.odometer_end_value)
 
 
 @frappe.whitelist()

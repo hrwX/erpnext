@@ -14,6 +14,7 @@ from frappe.desk.notifications import clear_doctype_notifications
 from frappe.model.mapper import get_mapped_doc
 from frappe.model.utils import get_fetch_values
 from frappe.utils import cint, flt, get_link_to_form
+from erpnext.selling.doctype.sales_order.sales_order import validate_delivery_window
 
 form_grid_templates = {
 	"items": "templates/form_grid/item_grid.html"
@@ -117,6 +118,8 @@ class DeliveryNote(SellingController):
 		self.validate_uom_is_integer("uom", "qty")
 		self.validate_with_previous_doc()
 		self.validate_batch_coa()
+		self.link_invoice_against_delivery_note()
+		validate_delivery_window(self, "validate")
 
 		if self._action != 'submit' and not self.is_return:
 			set_batch_nos(self, 'warehouse', True)
@@ -197,6 +200,8 @@ class DeliveryNote(SellingController):
 		if frappe.db.get_single_value("Accounts Settings", "auto_create_invoice_on_delivery_note") == "Submit":
 			self.make_sales_invoice_for_delivery()
 
+		self.link_invoice_against_delivery_note()
+
 	def on_submit(self):
 		self.validate_packed_qty()
 
@@ -226,6 +231,8 @@ class DeliveryNote(SellingController):
 		# TODO: Close sales orders that are marked for it; find a better way to do this
 		if self.issue_credit_note:
 			self.close_sales_orders()
+
+		validate_delivery_window(self, "on_submit")
 
 	def on_update_after_submit(self):
 		self.status = "Delivered" if self.delivered else "To Deliver"
@@ -405,6 +412,16 @@ class DeliveryNote(SellingController):
 			if so_doc.get("is_completed"):
 				so_doc.update_status("Closed")
 
+	def link_invoice_against_delivery_note(self):
+		for item in self.items:
+			if item.against_sales_order and not item.against_sales_invoice:
+				sales_invoice = frappe.get_all("Sales Invoice Item", filters={
+					"docstatus": 1,
+					"sales_order": item.against_sales_order
+				}, fields=["distinct(parent)"])
+
+				if sales_invoice and len(sales_invoice) == 1:
+					item.against_sales_invoice = sales_invoice[0].parent
 
 def update_billed_amount_based_on_so(so_detail, update_modified=True):
 	# Billed against Sales Order directly

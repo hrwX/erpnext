@@ -313,6 +313,25 @@ class StockEntry(StockController):
 			if cstr(d.s_warehouse) == cstr(d.t_warehouse) and not self.purpose == "Material Transfer for Manufacture":
 				frappe.throw(_("Source and target warehouse cannot be same for row {0}").format(d.idx))
 
+	def add_comment_to_batch(self):
+		for item in self.items:
+			if not item.batch_no:
+				continue
+
+			if item.s_warehouse:
+				comment_text = "{qty} {uom} consumed by {stock_entry}".format(qty=item.qty, uom=item.uom, stock_entry=self.name)
+			elif item.t_warehouse:
+				comment_text = "{qty} {uom} created from {stock_entry}".format(qty=item.qty, uom=item.uom, stock_entry=self.name)
+
+			frappe.get_doc({
+				"doctype":"Comment",
+				'comment_type': "Info",
+				"comment_email": frappe.session.user,
+				"reference_doctype": "Batch",
+				"reference_name": item.batch_no,
+				"content": comment_text,
+			}).insert(ignore_permissions=True)
+
 	def validate_work_order(self):
 		if self.purpose in ("Manufacture", "Material Transfer for Manufacture", "Material Consumption for Manufacture"):
 			# check if work order is entered

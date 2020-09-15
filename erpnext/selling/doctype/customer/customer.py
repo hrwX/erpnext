@@ -15,6 +15,7 @@ from frappe.contacts.address_and_contact import load_address_and_contact, delete
 from frappe.model.rename_doc import update_linked_doctypes
 from frappe.model.mapper import get_mapped_doc
 from frappe.utils.user import get_users_with_role
+from erpnext.setup.doctype.company.company import validate_default_license, validate_expired_licenses
 
 
 class Customer(TransactionBase):
@@ -59,6 +60,9 @@ class Customer(TransactionBase):
 		self.check_customer_group_change()
 		self.validate_default_bank_account()
 		self.validate_delivery_window_times()
+		self.update_lead_acc_open_date()
+		validate_default_license(self)
+		validate_expired_licenses(self)
 
 		# set loyalty program tier
 		if frappe.db.exists('Customer', self.name):
@@ -69,6 +73,12 @@ class Customer(TransactionBase):
 		if self.sales_team:
 			if sum([member.allocated_percentage or 0 for member in self.sales_team]) != 100:
 				frappe.throw(_("Total contribution percentage should be equal to 100"))
+
+	def update_lead_acc_open_date(self):
+		"""update lead account opend date"""
+
+		if self.lead_name and self.opening_date:
+			frappe.db.set_value("Lead", self.lead_name, "account_opened_date", self.opening_date)
 
 	def check_customer_group_change(self):
 		frappe.flags.customer_group_changed = False

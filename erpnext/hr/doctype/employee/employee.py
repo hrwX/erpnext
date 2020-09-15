@@ -47,6 +47,7 @@ class Employee(NestedSet):
 		self.validate_status()
 		self.validate_reports_to()
 		self.validate_preferred_email()
+		self.update_driver_employee()
 		if self.job_applicant:
 			self.validate_onboarding_process()
 
@@ -231,6 +232,15 @@ class Employee(NestedSet):
 			self.get('user_id') != prev_doc.get('user_id')):
 			frappe.cache().hdel('employees_with_number', cell_number)
 			frappe.cache().hdel('employees_with_number', prev_number)
+
+	def update_driver_employee(self):
+		if self.user_id:
+			driver = frappe.db.get_value("Driver", {"user_id": self.user_id}, "name")
+		else:
+			driver = frappe.db.get_value("Driver", {"employee": self.name}, "name")
+
+		if driver:
+			frappe.db.set_value("Driver", driver, "employee", self.name if self.user_id else None)
 
 def get_timeline_data(doctype, name):
 	'''Return timeline for attendance'''

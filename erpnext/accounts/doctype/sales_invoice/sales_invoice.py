@@ -151,6 +151,10 @@ class SalesInvoice(SellingController):
 	def before_save(self):
 		set_account_for_mode_of_payment(self)
 
+	def before_update_after_submit(self):
+		self.set_status()
+		self.set_indicator()
+
 	def on_submit(self):
 		self.validate_pos_paid_amount()
 

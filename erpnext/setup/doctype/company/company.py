@@ -16,6 +16,7 @@ from frappe.utils.nestedset import NestedSet
 
 from past.builtins import cmp
 import functools
+from frappe.utils import unique, date_diff, getdate
 
 class Company(NestedSet):
 	nsm_parent_field = 'parent_company'
@@ -47,6 +48,8 @@ class Company(NestedSet):
 		self.validate_perpetual_inventory()
 		self.check_country_change()
 		self.set_chart_of_accounts()
+		validate_default_license(self)
+		validate_expired_licenses(self)
 
 	def validate_abbr(self):
 		if not self.abbr:
@@ -591,3 +594,32 @@ def get_default_company_address(name, sort_key='is_primary_address', existing_ad
 		return sorted(out, key = functools.cmp_to_key(lambda x,y: cmp(y[1], x[1])))[0][0]
 	else:
 		return None
+
+def validate_default_license(doc):
+	"""allow to set only one default license for supplier or customer"""
+
+	# remove duplicate licenses
+	unique_licenses = unique([license.license for license in doc.licenses])
+
+	if len(doc.licenses) != len(unique_licenses):
+		frappe.throw(_("Please remove duplicate licenses before proceeding"))
+
+	if len(doc.licenses) == 1:
+		# auto-set default license if only one is found
+		doc.licenses[0].is_default = 1
+	elif len(doc.licenses) > 1:
+		default_licenses = [license for license in doc.licenses if license.is_default]
+		# prevent users from setting multiple default licenses
+		if not default_licenses:
+			frappe.throw(_("There must be atleast one default license, found none"))
+		elif len(default_licenses) > 1:
+			frappe.throw(_("There can be only one default license for {0}, found {1}").format(doc.name, len(default_licenses)))
+
+def validate_expired_licenses(doc):
+	"""remove expired licenses from company, customer and supplier records"""
+
+	for row in doc.licenses:
+		if row.license_expiry_date and row.license_expiry_date < getdate(today()):
+			expired_since = date_diff(getdate(today()), getdate(row.license_expiry_date))
+
+			frappe.msgprint(_("Row #{0}: License {1} has expired {2} days ago").format(row.idx, frappe.bold(row.license), frappe.bold(expired_since)))

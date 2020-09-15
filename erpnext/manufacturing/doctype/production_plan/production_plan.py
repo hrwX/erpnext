@@ -18,6 +18,7 @@ class ProductionPlan(Document):
 	def validate(self):
 		self.calculate_total_planned_qty()
 		self.set_status()
+		self.set_workstations()
 
 	def validate_data(self):
 		for d in self.get('po_items'):
@@ -28,6 +29,12 @@ class ProductionPlan(Document):
 
 			if not flt(d.planned_qty):
 				frappe.throw(_("Please enter Planned Qty for Item {0} at row {1}").format(d.item_code, d.idx))
+
+	def set_workstations(self):
+		for item in self.get("po_items"):
+			bom_operations = frappe.get_all("BOM Operation", filters={"parent": item.bom_no}, fields=["workstation"])
+			if bom_operations:
+				item.workstations = '\n'.join([operation.workstation for operation in bom_operations if operation.workstation])
 
 	def get_open_sales_orders(self):
 		""" Pull sales orders  which are pending to deliver based on criteria selected"""
@@ -705,7 +712,7 @@ def get_items_for_material_requests(doc, ignore_existing_ordered_qty=None):
 def get_item_data(item_code):
 	item_details = get_item_details(item_code)
 	bom_no = item_details.get("bom_no")
-	
+
 	total_operating_hours = frappe.db.get_value(
 		"BOM Operation", {"parent": bom_no}, "sum(time_in_mins) AS total_operating_time")
 	total_operating_hours = flt(total_operating_hours) / 60.0

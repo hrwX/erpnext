@@ -12,16 +12,16 @@ from erpnext.controllers.item_variant import (ItemVariantExistsError,
 		copy_attributes_to_variant, get_variant, make_variant_item_code, validate_item_variant_attributes)
 from erpnext.setup.doctype.item_group.item_group import (get_parent_item_groups, invalidate_cache_for)
 from frappe import _, msgprint
-from frappe.utils import (cint, cstr, flt, formatdate, get_timestamp, getdate,
-						  now_datetime, random_string, strip)
+from frappe.utils import cint, cstr, flt, formatdate, get_timestamp, getdate, now_datetime, random_string, strip
 from frappe.utils.html_utils import clean_html
-from frappe.website.doctype.website_slideshow.website_slideshow import \
-	get_slideshow
-
+from frappe.website.doctype.website_slideshow.website_slideshow import get_slideshow
 from frappe.website.render import clear_cache
 from frappe.website.website_generator import WebsiteGenerator
 
-from six import iteritems
+from six import iteritems, string_types
+from erpnext import get_default_company
+from erpnext.accounts.utils import get_company_default
+from frappe.utils import cstr
 
 
 class DuplicateReorderRows(frappe.ValidationError):
@@ -58,18 +58,54 @@ class Item(WebsiteGenerator):
 		self.set_onload('asset_naming_series', self._asset_naming_series)
 
 	def autoname(self):
-		if frappe.db.get_default("item_naming_by") == "Naming Series":
-			if self.variant_of:
-				if not self.item_code:
-					template_item_name = frappe.db.get_value("Item", self.variant_of, "item_name")
-					self.item_code = make_variant_item_code(self.variant_of, template_item_name, self)
-			else:
-				from frappe.model.naming import set_name_by_naming_series
-				set_name_by_naming_series(self)
-				self.item_code = self.name
+		if self.custom_autoname:
+			self.custom_autoname()
+		else:
+			if frappe.db.get_default("item_naming_by") == "Naming Series":
+				if self.variant_of:
+					if not self.item_code:
+						template_item_name = frappe.db.get_value("Item", self.variant_of, "item_name")
+						self.item_code = make_variant_item_code(self.variant_of, template_item_name, self)
+				else:
+					from frappe.model.naming import set_name_by_naming_series
+					set_name_by_naming_series(self)
+					self.item_code = self.name
 
-		self.item_code = strip(self.item_code)
-		self.name = self.item_code
+			self.item_code = strip(self.item_code)
+			self.name = self.item_code
+
+	def custom_autoname(self):
+		"""
+			Item Code = a + b + c + d + e, where
+				a = abbreviated Company; all caps.
+				b = abbreviated Brand; all caps.
+				c = abbreviated Item Group; all caps.
+				d = abbreviated Item Name; all caps.
+				e = variant ID number; has to be incremented.
+		"""
+
+		if not frappe.db.get_single_value("Stock Settings", "autoname_item"):
+			return
+
+		# Get abbreviations
+		company_abbr = get_company_default(get_default_company(), "abbr")
+		brand_abbr = get_abbr(self.brand, max_length=len(company_abbr))
+		brand_abbr = brand_abbr if company_abbr != brand_abbr else None
+		item_group_abbr = get_abbr(self.item_group)
+		item_name_abbr = get_abbr(self.item_name, 3)
+
+		params = list(filter(None, [company_abbr, brand_abbr, item_group_abbr, item_name_abbr]))
+		item_code = "-".join(params)
+
+		# Get count
+		count = len(frappe.get_all("Item", filters={"name": ["like", "%{}%".format(item_code)]}))
+
+		if count > 0:
+			item_code = "-".join([item_code, cstr(count + 1)])
+
+		# Set item document name
+		self.name = self.item_code = item_code
+
 
 	def before_insert(self):
 		if not self.description:
@@ -1132,3 +1168,42 @@ def toggle_variants_website_display(item_name, value):
 def on_doctype_update():
 	# since route is a Text column, it needs a length for indexing
 	frappe.db.add_index("Item", ["route(500)"])
+
+def get_abbr(txt, max_length=2):
+	"""
+		Extract abbreviation from the given string as:
+			- Single-word strings abbreviate to the letters of the string, upto the max length
+			- Multi-word strings abbreviate to the initials of each word, upto the max length
+
+	Args:
+		txt (str): The string to abbreviate
+		max_length (int, optional): The max length of the abbreviation. Defaults to 2.
+
+	Returns:
+		str: The abbreviated string, in uppercase
+	"""
+
+	if not txt:
+		return
+
+	if not isinstance(txt, string_types):
+		try:
+			txt = str(txt)
+		except:
+			return
+
+	abbr = ""
+	words = txt.split(" ")
+
+	if len(words) > 1:
+		for word in words:
+			if len(abbr) >= max_length:
+				break
+
+			if word.strip():
+				abbr += word.strip()[0]
+	else:
+		abbr = txt[:max_length]
+
+	abbr = abbr.upper()
+	return abbr

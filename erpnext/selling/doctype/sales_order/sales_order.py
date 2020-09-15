@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import frappe
 import json
 import frappe.utils
-from frappe.utils import cstr, flt, getdate, cint, nowdate, add_days, get_link_to_form
+from frappe.utils import cstr, flt, getdate, cint, nowdate, add_days, get_link_to_form, today, to_timedelta, get_time
 from frappe import _
 from six import string_types
 from frappe.model.utils import get_fetch_values
@@ -21,6 +21,8 @@ from erpnext.setup.doctype.item_group.item_group import get_item_group_defaults
 from erpnext.manufacturing.doctype.production_plan.production_plan import get_items_for_material_requests
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import validate_inter_company_party, update_linked_doc,\
 	unlink_inter_company_doc
+from erpnext.stock.doctype.batch.batch import get_batch_qty
+from frappe.utils.user import get_users_with_role
 
 form_grid_templates = {
 	"items": "templates/form_grid/item_grid.html"
@@ -45,6 +47,8 @@ class SalesOrder(SellingController):
 		self.validate_drop_ship()
 		self.validate_serial_no_based_delivery()
 		validate_inter_company_party(self.doctype, self.customer, self.company, self.inter_company_order_reference)
+		self.validate_batch_item()
+		validate_delivery_window(self, "validate")
 
 		if self.coupon_code:
 			from erpnext.accounts.doctype.pricing_rule.utils import validate_coupon_code
@@ -176,6 +180,8 @@ class SalesOrder(SellingController):
 			from erpnext.accounts.doctype.pricing_rule.utils import update_coupon_code_count
 			update_coupon_code_count(self.coupon_code,'used')
 
+		validate_delivery_window(self, "on_submit")
+
 	def on_cancel(self):
 		super(SalesOrder, self).on_cancel()
 
@@ -306,8 +312,21 @@ class SalesOrder(SellingController):
 				"reserved_qty": get_reserved_qty(item_code, warehouse)
 			})
 
-	def on_update(self):
-		pass
+	def on_update_after_submit(self):
+		self.check_overdue_status()
+
+	def check_overdue_status(self):
+		overdue_conditions = [
+			self.docstatus == 1,
+			self.status not in ["On Hold", "Closed", "Completed"],
+			self.skip_delivery_note == 0,
+			flt(self.per_delivered, 6) < 100,
+			getdate(self.delivery_date) < getdate(today()),
+		]
+
+		is_overdue = all(overdue_conditions)
+		if is_overdue != self.is_overdue:
+			self.db_set("is_overdue", is_overdue)
 
 	def set_title(self):
 		self.title = self.customer
@@ -460,6 +479,20 @@ class SalesOrder(SellingController):
 				frappe.throw(_("Cannot ensure delivery by Serial No as \
 				Item {0} is added with and without Ensure Delivery by \
 				Serial No.").format(item.item_code))
+
+	def validate_batch_item(self):
+		for item in self.items:
+			qty = item.stock_qty or item.transfer_qty or item.qty or 0
+			has_batch_no = frappe.db.get_value('Item', item.item_code, 'has_batch_no')
+
+			if has_batch_no and item.batch_no and item.warehouse and qty > 0:
+				batch_qty = get_batch_qty(batch_no=item.batch_no, warehouse=item.warehouse)
+
+				if flt(batch_qty, item.precision("qty")) < flt(qty, item.precision("qty")):
+					frappe.throw(_("""Row #{0}: The batch {1} has only {2} qty. Either select a different batch that has more than {3}
+						qty available, or split the row to sell from multiple batches.
+					""").format(item.idx, item.batch_no, batch_qty, qty))
+
 
 def get_list_context(context=None):
 	from erpnext.controllers.website_list_for_contact import get_list_context
@@ -1057,3 +1090,48 @@ def update_produced_qty_in_so_item(sales_order, sales_order_item):
 	if not total_produced_qty and frappe.flags.in_patch: return
 
 	frappe.db.set_value('Sales Order Item', sales_order_item, 'produced_qty', total_produced_qty)
+
+def validate_delivery_window(doc, method):
+	from erpnext.stock.doctype.delivery_trip.delivery_trip import get_delivery_window
+
+	if not frappe.db.get_single_value("Delivery Settings", "send_delivery_window_warning") \
+		or not (doc.get("delivery_start_time") and doc.get("delivery_end_time")) or doc.get("customer"):
+		return
+
+
+	delivery_window = get_delivery_window(customer=doc.get("customer"))
+	delivery_start_time = delivery_window.delivery_start_time
+	delivery_end_time = delivery_window.delivery_end_time
+
+	if not (delivery_start_time and delivery_end_time):
+		return
+
+	if to_timedelta(doc.delivery_start_time) < to_timedelta(delivery_start_time) or to_timedelta(doc.delivery_end_time) > to_timedelta(delivery_end_time):
+		if method == "validate":
+			frappe.msgprint(_("The delivery window is set outside the customer's default timings"))
+		elif method == "on_submit":
+			# send an email notifying users that the document is outside the customer's delivery window
+			role_profiles = ["Fulfillment Manager"]
+			role_profile_users = frappe.get_all("User", filters={"role_profile_name": ["IN", role_profiles]}, fields=["email"])
+			role_profile_users = [user.email for user in role_profile_users]
+
+			accounts_managers = get_users_with_role("Accounts Manager")
+			system_managers = get_users_with_role("System Manager")
+
+			recipients = list(set(role_profile_users + accounts_managers) - set(system_managers))
+
+			if not recipients:
+				return
+
+			# form the email
+			subject = _("[Info] An order may be delivered outside a customer's preferred delivery window")
+			message = _("""An order ({name}) has the following delivery window: {doc_start} - {doc_end}<br><br>
+				While the default delivery window is {customer_start} - {customer_end}""".format(
+					name=frappe.utils.get_link_to_form(doc.doctype, doc.name),
+					doc_start=get_time(doc.delivery_start_time).strftime("%I:%M %p"),
+					doc_end=get_time(doc.delivery_end_time).strftime("%I:%M %p"),
+					customer_start=get_time(delivery_start_time).strftime("%I:%M %p"),
+					customer_end=get_time(delivery_end_time).strftime("%I:%M %p"),
+				))
+
+			frappe.sendmail(recipients=recipients, subject=subject, message=message)

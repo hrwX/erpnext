@@ -8,6 +8,7 @@ from frappe import _
 from frappe.model import no_value_fields
 from frappe.model.document import Document
 from frappe.utils import cint, flt
+from frappe.model.mapper import get_mapped_doc
 
 
 class PackingSlip(Document):
@@ -64,6 +65,9 @@ class PackingSlip(Document):
 
 		if res:
 			frappe.throw(_("""Case No(s) already in use. Try from Case No {0}""").format(self.get_recommended_case_no()))
+
+	def on_submit(self):
+		self.create_stock_entry()
 
 	def validate_qty(self):
 		"""Check packed qty across packing slips and delivery note"""
@@ -174,6 +178,37 @@ class PackingSlip(Document):
 						ch.set(d.fieldname, item.get(d.fieldname))
 
 		self.update_item_details()
+
+	def create_stock_entry(self, target_doc=None):
+		def set_missing_values(source, target):
+			target.stock_entry_type = "Material Transfer"
+			target.company = frappe.db.get_value("Delivery Note", source.delivery_note, "company")
+			packing_warehouse = frappe.db.get_single_value("Delivery Settings", "packing_warehouse")
+
+			for item in target.items:
+				if not item.t_warehouse:
+					item.t_warehouse = packing_warehouse
+
+		doc = get_mapped_doc("Packing Slip", self.name, {
+			"Packing Slip": {
+				"doctype": "Stock Entry",
+				"validation": {
+					"docstatus": ["=", 1]
+				}
+			},
+			"Packing Slip Item": {
+				"doctype": "Stock Entry Detail",
+				"field_map": {
+					"serial_no": "serial_no",
+					"batch_no": "batch_no",
+					"source_warehouse": "s_warehouse",
+					"target_warehouse": "t_warehouse"
+				},
+			}
+		}, target_doc, set_missing_values)
+
+		doc.save()
+		doc.submit()
 
 def item_details(doctype, txt, searchfield, start, page_len, filters):
 	from erpnext.controllers.queries import get_match_cond

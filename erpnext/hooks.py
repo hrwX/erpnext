@@ -318,13 +318,15 @@ scheduler_events = {
 		"erpnext.support.doctype.service_level_agreement.service_level_agreement.check_agreement_status",
 		"erpnext.crm.doctype.email_campaign.email_campaign.send_email_to_leads_or_contacts",
 		"erpnext.crm.doctype.email_campaign.email_campaign.set_email_campaign_status",
-		"erpnext.selling.doctype.quotation.quotation.set_expired_status"
+		"erpnext.selling.doctype.quotation.quotation.set_expired_status",
+		"erpnext.selling.doctype.sales_order.sales_order.create_sales_invoice_against_contract"
 	],
 	"daily_long": [
 		"erpnext.setup.doctype.email_digest.email_digest.send",
 		"erpnext.manufacturing.doctype.bom_update_tool.bom_update_tool.update_latest_price_in_all_boms",
 		"erpnext.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation",
-		"erpnext.hr.utils.generate_leave_encashment"
+		"erpnext.hr.utils.generate_leave_encashment",
+		"erpnext.selling.doctype.sales_order.sales_order.update_order_status"
 	],
 	"monthly": [
 		"erpnext.selling.doctype.customer.customer.set_total_monthly_sales_to_zero"

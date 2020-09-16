@@ -11,7 +11,6 @@ frappe.ui.form.on("Driver", {
 			};
 		});
 	},
-
 	refresh: function(frm) {
 		frm.set_query("address", function() {
 			return {
@@ -21,7 +20,6 @@ frappe.ui.form.on("Driver", {
 			};
 		});
 	},
-
 	transporter: function(frm, cdt, cdn) {
 		// this assumes that supplier's address has same title as supplier's name
 		frappe.db
@@ -32,5 +30,14 @@ frappe.ui.form.on("Driver", {
 			.catch(err => {
 				console.log(err);
 			});
+	},
+	user_id: function(frm) {
+		if(frm.doc.user_id) {
+			frappe.db.get_value("Employee", {"user_id": frm.doc.user_id}, "name", (r) => {
+				if(r && r.name) {
+					frm.set_value("employee", r.name);
+				}
+			});
+		}
 	}
 });

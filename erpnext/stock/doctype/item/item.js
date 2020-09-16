@@ -771,6 +771,33 @@ $.extend(erpnext.item, {
 			frm.toggle_display("attributes", false);
 		}
 		frm.layout.refresh_sections();
+	},
+
+	item_name: function (frm) {
+		if (frm.is_new()) {
+			frm.trigger("build_item_code");
+		}
+	},
+
+	item_group: (frm) => {
+		if (frm.is_new()) {
+			frm.trigger("build_item_code");
+		}
+	},
+
+	brand: (frm) => {
+		if (frm.is_new()) {
+			frm.trigger("build_item_code");
+		}
+	},
+
+	build_item_code: (frm) => {
+		// TODO: allow toggling autoname from the website
+		frm.call("custom_autoname",{
+			item: frm.doc
+		}).then((r) => {
+			frm.set_value("item_code", r && r.message ? r.message : null);
+		});
 	}
 });
 

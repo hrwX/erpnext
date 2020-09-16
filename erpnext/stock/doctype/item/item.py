@@ -58,21 +58,18 @@ class Item(WebsiteGenerator):
 		self.set_onload('asset_naming_series', self._asset_naming_series)
 
 	def autoname(self):
-		if self.custom_autoname:
-			self.custom_autoname()
-		else:
-			if frappe.db.get_default("item_naming_by") == "Naming Series":
-				if self.variant_of:
-					if not self.item_code:
-						template_item_name = frappe.db.get_value("Item", self.variant_of, "item_name")
-						self.item_code = make_variant_item_code(self.variant_of, template_item_name, self)
-				else:
-					from frappe.model.naming import set_name_by_naming_series
-					set_name_by_naming_series(self)
-					self.item_code = self.name
+		if frappe.db.get_default("item_naming_by") == "Naming Series":
+			if self.variant_of:
+				if not self.item_code:
+					template_item_name = frappe.db.get_value("Item", self.variant_of, "item_name")
+					self.item_code = make_variant_item_code(self.variant_of, template_item_name, self)
+			else:
+				from frappe.model.naming import set_name_by_naming_series
+				set_name_by_naming_series(self)
+				self.item_code = self.name
 
-			self.item_code = strip(self.item_code)
-			self.name = self.item_code
+		self.item_code = strip(self.item_code)
+		self.name = self.item_code
 
 	def custom_autoname(self):
 		"""
@@ -105,7 +102,7 @@ class Item(WebsiteGenerator):
 
 		# Set item document name
 		self.name = self.item_code = item_code
-
+		return item_code
 
 	def before_insert(self):
 		if not self.description:

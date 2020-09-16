@@ -188,7 +188,7 @@ frappe.ui.form.on('Production Plan', {
 	},
 
 	get_items_for_mr: function(frm) {
-		const set_fields = ['actual_qty', 'item_code','item_name', 'description', 'uom', 
+		const set_fields = ['actual_qty', 'item_code','item_name', 'description', 'uom',
 			'min_order_qty', 'quantity', 'sales_order', 'warehouse', 'projected_qty', 'material_request_type'];
 		frappe.call({
 			method: "erpnext.manufacturing.doctype.production_plan.production_plan.get_items_for_material_requests",
@@ -272,7 +272,18 @@ frappe.ui.form.on("Production Plan Item", {
 				}
 			});
 		}
-	}
+	},
+	bom_no: function(frm, cdt, cdn) {
+		let row = locals[cdt][cdn];
+		if (row.bom_no) {
+			frappe.model.with_doc("BOM", row.bom_no, function() {
+				let bom_doc = frappe.model.get_doc("BOM", row.bom_no);
+				let workstations = bom_doc.operations.map(operation => operation.workstation);
+				row.workstations = workstations.join('\n');
+				frm.refresh_field("po_items");
+			});
+		}
+    }
 });
 
 frappe.ui.form.on("Material Request Plan Item", {

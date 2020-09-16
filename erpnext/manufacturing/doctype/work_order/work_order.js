@@ -103,8 +103,36 @@ frappe.ui.form.on("Work Order", {
 		});
 
 		// formatter for work order operation
-		frm.set_indicator_formatter('operation',
-			function(doc) { return (frm.doc.qty==doc.completed_qty) ? "green" : "orange"; });
+		frm.set_indicator_formatter('operation', function(doc) {
+			return (frm.doc.qty==doc.completed_qty) ? "green" : "orange";
+		});
+
+		frappe.meta.docfield_map["Work Order Operation"].operation.formatter = (value, df, options, doc) => {
+			if (!value) {
+				return '';
+			}
+
+			let label = value;
+			if (frappe.form.link_formatters[df.options]) {
+				label = frappe.form.link_formatters[df.options](value, doc);
+			}
+
+			let color = "green";
+			if (!doc.completed_qty) {
+				color = "red";
+			} else if (doc.completed_qty < frm.doc.qty) {
+				color = "orange";
+			}
+
+			const escaped_name = encodeURIComponent(value);
+
+			return repl('<a class="indicator %(color)s" href="#Form/%(doctype)s/%(name)s">%(label)s</a>', {
+				color: color,
+				doctype: df.options,
+				name: escaped_name,
+				label: label
+			});
+		};
 	},
 
 	onload: function(frm) {

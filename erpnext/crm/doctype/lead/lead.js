@@ -14,6 +14,7 @@ erpnext.LeadController = frappe.ui.form.Controller.extend({
 		};
 
 		this.frm.toggle_reqd("lead_name", !this.frm.doc.organization_lead);
+		this.frm.set_query("region", { "is_group": 1 });
 	},
 
 	onload: function () {
@@ -28,6 +29,25 @@ erpnext.LeadController = frappe.ui.form.Controller.extend({
 		this.frm.set_query("contact_by", function (doc, cdt, cdn) {
 			return { query: "frappe.core.doctype.user.user.user_query" }
 		});
+
+		if (this.frm.doc.region) {
+			this.frm.set_query("territory", () => {
+				return {
+					query: "erpnext.crm.doctype.lead.lead.filter_territory",
+					filters: {
+						region: this.frm.doc.region
+					}
+				};
+			});
+		}
+
+		if (!this.frm.doc.account_opened_date) {
+			frappe.db.get_value("Customer", { "lead_name": frm.doc.name }, ["opening_date", "creation"], (r) => {
+				if (r) {
+					this.frm.set_value("account_opened_date", r.opening_date ? r.opening_date : r.creation);
+				}
+			});
+		}
 	},
 
 	refresh: function () {

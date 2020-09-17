@@ -12,4 +12,4 @@ class Driver(Document):
 		if not self.user_id:
 			return
 
-		self.employee = frappe.db.get_value("Employee", {"user_id": self.user_id}) or None
+		self.employee = frappe.db.get_value("Employee", {"user_id": self.user_id})

@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import frappe
 import json
 import frappe.utils
-from frappe.utils import cstr, flt, getdate, cint, nowdate, add_days, get_link_to_form, today, to_timedelta, get_time
+from frappe.utils import cstr, flt, getdate, cint, nowdate, add_days, get_link_to_form, today
 from frappe import _
 from six import string_types
 from frappe.model.utils import get_fetch_values
@@ -23,6 +23,7 @@ from erpnext.accounts.doctype.sales_invoice.sales_invoice import validate_inter_
 	unlink_inter_company_doc
 from erpnext.stock.doctype.batch.batch import get_batch_qty
 from frappe.utils.user import get_users_with_role
+from erpnext.stock.doctype.delivery_note.delivery_note import validate_delivery_window
 
 form_grid_templates = {
 	"items": "templates/form_grid/item_grid.html"
@@ -1090,51 +1091,6 @@ def update_produced_qty_in_so_item(sales_order, sales_order_item):
 	if not total_produced_qty and frappe.flags.in_patch: return
 
 	frappe.db.set_value('Sales Order Item', sales_order_item, 'produced_qty', total_produced_qty)
-
-def validate_delivery_window(doc, method):
-	from erpnext.stock.doctype.delivery_trip.delivery_trip import get_delivery_window
-
-	if not frappe.db.get_single_value("Delivery Settings", "send_delivery_window_warning") \
-		or not (doc.get("delivery_start_time") and doc.get("delivery_end_time")) or doc.get("customer"):
-		return
-
-
-	delivery_window = get_delivery_window(customer=doc.get("customer"))
-	delivery_start_time = delivery_window.delivery_start_time
-	delivery_end_time = delivery_window.delivery_end_time
-
-	if not (delivery_start_time and delivery_end_time):
-		return
-
-	if to_timedelta(doc.delivery_start_time) < to_timedelta(delivery_start_time) or to_timedelta(doc.delivery_end_time) > to_timedelta(delivery_end_time):
-		if method == "validate":
-			frappe.msgprint(_("The delivery window is set outside the customer's default timings"))
-		elif method == "on_submit":
-			# send an email notifying users that the document is outside the customer's delivery window
-			role_profiles = ["Fulfillment Manager"]
-			role_profile_users = frappe.get_all("User", filters={"role_profile_name": ["IN", role_profiles]}, fields=["email"])
-			role_profile_users = [user.email for user in role_profile_users]
-
-			accounts_managers = get_users_with_role("Accounts Manager")
-			system_managers = get_users_with_role("System Manager")
-
-			recipients = list(set(role_profile_users + accounts_managers) - set(system_managers))
-
-			if not recipients:
-				return
-
-			# form the email
-			subject = _("[Info] An order may be delivered outside a customer's preferred delivery window")
-			message = _("""An order ({name}) has the following delivery window: {doc_start} - {doc_end}<br><br>
-				While the default delivery window is {customer_start} - {customer_end}""".format(
-					name=frappe.utils.get_link_to_form(doc.doctype, doc.name),
-					doc_start=get_time(doc.delivery_start_time).strftime("%I:%M %p"),
-					doc_end=get_time(doc.delivery_end_time).strftime("%I:%M %p"),
-					customer_start=get_time(delivery_start_time).strftime("%I:%M %p"),
-					customer_end=get_time(delivery_end_time).strftime("%I:%M %p"),
-				))
-
-			frappe.sendmail(recipients=recipients, subject=subject, message=message)
 
 def create_sales_invoice_against_contract():
 	"""

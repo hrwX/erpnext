@@ -24,7 +24,7 @@ class Contract(Document):
 		# If identical, append contract name with the next number in the iteration
 		if frappe.db.exists("Contract", self.name):
 			count = len(frappe.get_all("Contract", filters={"name": ["like", "%{}%".format(self.name)]}))
-			self.name = "{} - {}".format(name, count)
+			self.name = "{} - {}".format(self.name, count)
 
 
 	def validate(self):

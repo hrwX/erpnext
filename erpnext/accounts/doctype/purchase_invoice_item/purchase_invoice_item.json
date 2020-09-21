@@ -60,6 +60,12 @@
   "total_weight",
   "column_break_38",
   "weight_uom",
+  "cultivation_tax_details",
+  "flower_weight",
+  "leaf_weight",
+  "plant_weight",
+  "column_break_59",
+  "cultivation_weight_uom",
   "warehouse_section",
   "warehouse",
   "rejected_warehouse",
@@ -102,7 +108,7 @@
  "fields": [
   {
    "bold": 1,
-   "columns": 3,
+   "columns": 2,
    "fieldname": "item_code",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -140,6 +146,7 @@
    "label": "Description",
    "oldfieldname": "description",
    "oldfieldtype": "Text",
+   "print_hide": 1,
    "print_width": "300px",
    "width": "300px"
   },
@@ -239,7 +246,8 @@
    "fieldname": "discount_amount",
    "fieldtype": "Currency",
    "label": "Discount Amount",
-   "options": "currency"
+   "options": "currency",
+   "print_hide": 1
   },
   {
    "fieldname": "col_break3",
@@ -372,7 +380,8 @@
   {
    "fieldname": "weight_per_unit",
    "fieldtype": "Float",
-   "label": "Weight Per Unit"
+   "label": "Weight Per Unit",
+   "print_hide": 1
   },
   {
    "fieldname": "total_weight",
@@ -399,7 +408,8 @@
    "fieldname": "warehouse",
    "fieldtype": "Link",
    "label": "Accepted Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "print_hide": 1
   },
   {
    "fieldname": "rejected_warehouse",
@@ -779,11 +789,40 @@
    "fieldtype": "Link",
    "label": "Package Tag",
    "options": "Package Tag"
+  },
+  {
+   "fieldname": "cultivation_tax_details",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "flower_weight",
+   "fieldtype": "Float",
+   "label": "Flower Weight"
+  },
+  {
+   "fieldname": "leaf_weight",
+   "fieldtype": "Float",
+   "label": "Leaf Weight"
+  },
+  {
+   "fieldname": "plant_weight",
+   "fieldtype": "Float",
+   "label": "Plant Weight"
+  },
+  {
+   "fieldname": "column_break_59",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cultivation_weight_uom",
+   "fieldtype": "Link",
+   "label": "Cultivation Weight UOM",
+   "options": "UOM"
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2020-08-06 04:17:43.605447",
+ "modified": "2020-09-20 23:37:48.329041",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Purchase Invoice Item",

@@ -17,6 +17,7 @@
   "customer_type",
   "default_bank_account",
   "lead_name",
+  "opening_date",
   "image",
   "column_break0",
   "account_manager",
@@ -36,6 +37,8 @@
   "default_price_list",
   "column_break_14",
   "language",
+  "licenses_section",
+  "licenses",
   "address_contacts",
   "address_html",
   "website",
@@ -91,6 +94,7 @@
   {
    "fieldname": "naming_series",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Series",
    "no_copy": 1,
    "options": "CUST-.YYYY.-",
@@ -119,6 +123,7 @@
    "depends_on": "eval:doc.customer_type != 'Company'",
    "fieldname": "gender",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Gender",
    "options": "Gender"
   },
@@ -129,7 +134,7 @@
    "label": "Type",
    "oldfieldname": "customer_type",
    "oldfieldtype": "Select",
-   "options": "Company\nIndividual",
+   "options": "Company\nIndividual\nCorporation\nLLC",
    "reqd": 1
   },
   {
@@ -550,12 +555,28 @@
    "fieldname": "delivery_days_section",
    "fieldtype": "Section Break",
    "label": "Delivery Days"
+  },
+  {
+   "fieldname": "opening_date",
+   "fieldtype": "Date",
+   "label": "Opening Date"
+  },
+  {
+   "fieldname": "licenses_section",
+   "fieldtype": "Section Break",
+   "label": "Licenses"
+  },
+  {
+   "fieldname": "licenses",
+   "fieldtype": "Table",
+   "label": "Licenses",
+   "options": "Compliance License Detail"
   }
  ],
  "icon": "fa fa-user",
  "idx": 363,
  "image_field": "image",
- "modified": "2020-09-08 01:00:08.123104",
+ "modified": "2020-09-21 03:41:46.386133",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Customer",

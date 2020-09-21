@@ -12,6 +12,7 @@
   "batch_id",
   "item",
   "item_name",
+  "item_group",
   "image",
   "parent_batch",
   "manufacturing_date",
@@ -212,13 +213,19 @@
    "fieldtype": "Long Text",
    "label": "Label Details",
    "read_only": 1
+  },
+  {
+   "fetch_from": "item.item_group",
+   "fieldname": "item_group",
+   "fieldtype": "Data",
+   "label": "Item Group"
   }
  ],
  "icon": "fa fa-archive",
  "idx": 1,
  "image_field": "image",
  "max_attachments": 5,
- "modified": "2020-09-01 02:27:03.853936",
+ "modified": "2020-09-21 04:31:16.526391",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Batch",

@@ -66,6 +66,12 @@
   "total_weight",
   "column_break_41",
   "weight_uom",
+  "cultivation_tax_details_section",
+  "flower_weight",
+  "leaf_weight",
+  "plant_weight",
+  "column_break_65",
+  "cultivation_weight_uom",
   "warehouse_and_reference",
   "warehouse",
   "rejected_warehouse",
@@ -428,7 +434,8 @@
   {
    "fieldname": "weight_per_unit",
    "fieldtype": "Float",
-   "label": "Weight Per Unit"
+   "label": "Weight Per Unit",
+   "print_hide": 1
   },
   {
    "fieldname": "total_weight",
@@ -832,11 +839,41 @@
    "fieldtype": "Link",
    "label": "Package Tag",
    "options": "Package Tag"
+  },
+  {
+   "fieldname": "cultivation_tax_details_section",
+   "fieldtype": "Section Break",
+   "label": "Cultivation Tax Details"
+  },
+  {
+   "fieldname": "flower_weight",
+   "fieldtype": "Float",
+   "label": "Flower Weight"
+  },
+  {
+   "fieldname": "leaf_weight",
+   "fieldtype": "Float",
+   "label": "Leaf Weight"
+  },
+  {
+   "fieldname": "plant_weight",
+   "fieldtype": "Float",
+   "label": "Plant Weight"
+  },
+  {
+   "fieldname": "column_break_65",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cultivation_weight_uom",
+   "fieldtype": "Link",
+   "label": "Cultivation Weight UOM",
+   "options": "UOM"
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2020-08-06 04:15:33.068875",
+ "modified": "2020-09-21 05:35:33.146192",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Purchase Receipt Item",

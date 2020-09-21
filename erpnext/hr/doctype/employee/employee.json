@@ -38,11 +38,13 @@
   "job_applicant",
   "scheduled_confirmation_date",
   "final_confirmation_date",
+  "id_verification",
   "job_offer",
   "col_break_22",
   "contract_end_date",
   "notice_number_of_days",
   "date_of_retirement",
+  "background_check",
   "job_profile",
   "department",
   "designation",
@@ -50,6 +52,7 @@
   "column_break_31",
   "grade",
   "branch",
+  "kra",
   "attendance_and_leave_details",
   "leave_policy",
   "attendance_device_id",
@@ -83,6 +86,7 @@
   "date_of_issue",
   "valid_upto",
   "place_of_issue",
+  "social_security_number",
   "column_break6",
   "marital_status",
   "blood_group",
@@ -132,6 +136,7 @@
    "oldfieldname": "naming_series",
    "oldfieldtype": "Select",
    "options": "HR-EMP-",
+   "reqd": 1,
    "set_only_once": 1
   },
   {
@@ -158,7 +163,8 @@
    "allow_in_quick_entry": 1,
    "fieldname": "last_name",
    "fieldtype": "Data",
-   "label": "Last Name"
+   "label": "Last Name",
+   "reqd": 1
   },
   {
    "fieldname": "employee_name",
@@ -209,6 +215,7 @@
   {
    "fieldname": "employee_number",
    "fieldtype": "Data",
+   "hidden": 1,
    "in_global_search": 1,
    "label": "Employee Number",
    "oldfieldname": "employee_number",
@@ -226,11 +233,11 @@
   {
    "fieldname": "gender",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Gender",
    "oldfieldname": "gender",
    "oldfieldtype": "Select",
-   "options": "Gender",
-   "reqd": 1
+   "options": "Gender"
   },
   {
    "description": "You can enter any date manually",
@@ -277,7 +284,7 @@
    "collapsible": 1,
    "fieldname": "erpnext_user",
    "fieldtype": "Section Break",
-   "label": "ERPNext User"
+   "label": "Bloomstack User"
   },
   {
    "description": "System User (login) ID. If set, it will become default for all HR forms.",
@@ -525,6 +532,7 @@
   {
    "fieldname": "permanent_accommodation_type",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Permanent Address Is",
    "options": "\nRented\nOwned"
   },
@@ -536,6 +544,7 @@
   {
    "fieldname": "current_accommodation_type",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Current Address Is",
    "options": "\nRented\nOwned"
   },
@@ -590,12 +599,14 @@
   {
    "fieldname": "marital_status",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Marital Status",
    "options": "\nSingle\nMarried\nDivorced\nWidowed"
   },
   {
    "fieldname": "blood_group",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Blood Group",
    "options": "\nA+\nA-\nB+\nB-\nAB+\nAB-\nO+\nO-"
   },
@@ -603,12 +614,14 @@
    "description": "Here you can maintain family details like name and occupation of parent, spouse and children",
    "fieldname": "family_background",
    "fieldtype": "Small Text",
+   "hidden": 1,
    "label": "Family Background"
   },
   {
    "description": "Here you can maintain height, weight, allergies, medical concerns etc",
    "fieldname": "health_details",
    "fieldtype": "Small Text",
+   "hidden": 1,
    "label": "Health Details"
   },
   {
@@ -784,12 +797,34 @@
    "fieldtype": "Link",
    "label": "Job Offer",
    "options": "Job Offer"
+  },
+  {
+   "fieldname": "id_verification",
+   "fieldtype": "Select",
+   "label": "ID Verification",
+   "options": "Yes\nNo\nIn Process"
+  },
+  {
+   "fieldname": "background_check",
+   "fieldtype": "Select",
+   "label": "Background Check",
+   "options": "Yes\nNo\nIn Process"
+  },
+  {
+   "fieldname": "kra",
+   "fieldtype": "Text",
+   "label": "Key Responsibility Area (KRA)"
+  },
+  {
+   "fieldname": "social_security_number",
+   "fieldtype": "Data",
+   "label": "Social Security Number"
   }
  ],
  "icon": "fa fa-user",
  "idx": 24,
  "image_field": "image",
- "modified": "2020-08-23 11:09:44.852180",
+ "modified": "2020-09-21 03:20:02.396967",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee",

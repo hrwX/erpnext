@@ -12,6 +12,10 @@
   "col_break1",
   "t_warehouse",
   "sec_break1",
+  "customer",
+  "column_break_8",
+  "supplier",
+  "section_break_10",
   "item_code",
   "item_group",
   "col_break2",
@@ -71,6 +75,7 @@
   {
    "fieldname": "barcode",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Barcode"
   },
   {
@@ -101,10 +106,12 @@
   },
   {
    "fieldname": "sec_break1",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Warehouse Party Details"
   },
   {
    "bold": 1,
+   "columns": 2,
    "fieldname": "item_code",
    "fieldtype": "Link",
    "in_global_search": 1,
@@ -167,6 +174,7 @@
   },
   {
    "bold": 1,
+   "columns": 2,
    "fieldname": "qty",
    "fieldtype": "Float",
    "in_list_view": 1,
@@ -506,11 +514,31 @@
    "in_list_view": 1,
    "label": "Package Tag",
    "options": "Package Tag"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2020-08-06 04:10:46.529496",
+ "modified": "2020-09-21 05:15:32.464101",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Stock Entry Detail",

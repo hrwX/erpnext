@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "autoname": "naming_series:",
  "creation": "2013-05-21 16:16:39",
@@ -22,6 +21,7 @@
   "company",
   "is_return",
   "return_against",
+  "license",
   "section_addresses",
   "supplier_address",
   "contact_person",
@@ -96,6 +96,9 @@
   "rounded_total",
   "in_words",
   "disable_rounded_total",
+  "payment_terms_section",
+  "payment_terms_template",
+  "payment_schedule",
   "terms_section_break",
   "tc_name",
   "terms",
@@ -1059,13 +1062,35 @@
    "fieldname": "scan_barcode",
    "fieldtype": "Data",
    "label": "Scan Barcode"
+  },
+  {
+   "fieldname": "license",
+   "fieldtype": "Link",
+   "label": "License",
+   "options": "Compliance Info"
+  },
+  {
+   "fieldname": "payment_terms_section",
+   "fieldtype": "Section Break",
+   "label": "Payment Terms"
+  },
+  {
+   "fieldname": "payment_terms_template",
+   "fieldtype": "Link",
+   "label": "Payment Terms Template",
+   "options": "Payment Terms Template"
+  },
+  {
+   "fieldname": "payment_schedule",
+   "fieldtype": "Link",
+   "label": "Payment Schedule",
+   "options": "Payment Schedule"
   }
  ],
  "icon": "fa fa-truck",
  "idx": 261,
  "is_submittable": 1,
- "links": [],
- "modified": "2020-04-17 13:06:26.970288",
+ "modified": "2020-09-21 05:29:31.762834",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Purchase Receipt",

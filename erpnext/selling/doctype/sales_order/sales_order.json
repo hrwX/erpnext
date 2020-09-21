@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "autoname": "naming_series:",
  "creation": "2013-06-18 12:39:59",
@@ -15,6 +14,7 @@
   "customer",
   "customer_name",
   "order_type",
+  "no_charge_order",
   "skip_delivery_note",
   "column_break1",
   "amended_from",
@@ -24,6 +24,7 @@
   "po_no",
   "po_date",
   "tax_id",
+  "license",
   "contact_info",
   "customer_address",
   "address_display",
@@ -110,6 +111,7 @@
   "tc_name",
   "terms",
   "more_info",
+  "contract",
   "inter_company_order_reference",
   "project",
   "party_account_currency",
@@ -141,7 +143,9 @@
   "to_date",
   "column_break_108",
   "auto_repeat",
-  "update_auto_repeat_reference"
+  "update_auto_repeat_reference",
+  "is_completed",
+  "is_overdue"
  ],
  "fields": [
   {
@@ -263,7 +267,7 @@
    "fieldname": "delivery_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Delivery Date",
+   "label": "Expected Delivery Date",
    "no_copy": 1
   },
   {
@@ -854,7 +858,8 @@
   {
    "fieldname": "payment_schedule_section",
    "fieldtype": "Section Break",
-   "label": "Payment Terms"
+   "label": "Payment Terms",
+   "print_hide": 1
   },
   {
    "fieldname": "payment_terms_template",
@@ -1225,13 +1230,36 @@
    "fieldname": "delivery_end_time",
    "fieldtype": "Time",
    "label": "Delivery End time"
+  },
+  {
+   "default": "0",
+   "fieldname": "no_charge_order",
+   "fieldtype": "Check",
+   "label": "No Charge"
+  },
+  {
+   "fieldname": "license",
+   "fieldtype": "Link",
+   "label": "License",
+   "options": "Compliance Info"
+  },
+  {
+   "fieldname": "contract",
+   "fieldtype": "Link",
+   "label": "Contract",
+   "options": "Contract"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_overdue",
+   "fieldtype": "Check",
+   "label": "Is Overdue"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "links": [],
- "modified": "2020-07-16 01:47:12.785055",
+ "modified": "2020-09-21 03:53:09.143248",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Sales Order",

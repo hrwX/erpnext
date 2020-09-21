@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "autoname": "naming_series:",
  "creation": "2013-05-24 19:29:08",
@@ -14,12 +13,16 @@
   "quotation_to",
   "party_name",
   "customer_name",
+  "no_charge_order",
   "column_break1",
   "amended_from",
   "company",
   "transaction_date",
   "valid_till",
   "order_type",
+  "license",
+  "signature_section",
+  "customer_signature",
   "contact_section",
   "customer_address",
   "address_display",
@@ -923,14 +926,35 @@
    "label": "Lost Reasons",
    "options": "Lost Reason Detail",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "no_charge_order",
+   "fieldtype": "Check",
+   "label": "No Charge"
+  },
+  {
+   "fieldname": "license",
+   "fieldtype": "Link",
+   "label": "License",
+   "options": "Compliance Info"
+  },
+  {
+   "fieldname": "signature_section",
+   "fieldtype": "Section Break",
+   "label": "Signature"
+  },
+  {
+   "fieldname": "customer_signature",
+   "fieldtype": "Signature",
+   "label": "Customer Signature"
   }
  ],
  "icon": "fa fa-shopping-cart",
  "idx": 82,
  "is_submittable": 1,
- "links": [],
  "max_attachments": 1,
- "modified": "2020-07-16 06:14:56.179139",
+ "modified": "2020-09-21 03:47:24.121784",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Quotation",

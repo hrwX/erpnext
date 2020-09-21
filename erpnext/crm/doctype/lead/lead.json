@@ -7,7 +7,13 @@
  "document_type": "Document",
  "engine": "InnoDB",
  "field_order": [
+  "hub_sync_id",
   "organization_lead",
+  "lead_dashboard_section",
+  "region",
+  "account_opened_date",
+  "column_break_6",
+  "number_of_employees",
   "contact_by",
   "address_html",
   "contact_html",
@@ -16,6 +22,7 @@
   "territory",
   "lead_name",
   "company_name",
+  "type_of_business",
   "email_id",
   "col_break123",
   "lead_owner",
@@ -70,6 +77,7 @@
   {
    "fieldname": "lead_details",
    "fieldtype": "Section Break",
+   "label": "Lead",
    "options": "fa fa-user"
   },
   {
@@ -148,6 +156,7 @@
   {
    "fieldname": "gender",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Gender",
    "options": "Gender"
   },
@@ -221,7 +230,6 @@
    "no_copy": 1
   },
   {
-   "collapsible": 1,
    "fieldname": "notes_section",
    "fieldtype": "Section Break",
    "label": "Notes"
@@ -415,7 +423,7 @@
   {
    "fieldname": "designation",
    "fieldtype": "Link",
-   "label": "Designation",
+   "label": "Title",
    "options": "Designation"
   },
   {
@@ -433,12 +441,48 @@
    "fieldname": "contact_section",
    "fieldtype": "Section Break",
    "label": "Contact"
+  },
+  {
+   "fieldname": "hub_sync_id",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Hub Sync ID"
+  },
+  {
+   "fieldname": "lead_dashboard_section",
+   "fieldtype": "Section Break",
+   "label": "Lead Dashboard"
+  },
+  {
+   "fieldname": "region",
+   "fieldtype": "Link",
+   "label": "Region",
+   "options": "Territory"
+  },
+  {
+   "fieldname": "account_opened_date",
+   "fieldtype": "Date",
+   "label": "Account Opened Date"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "number_of_employees",
+   "fieldtype": "Int",
+   "label": "Number of Employees"
+  },
+  {
+   "fieldname": "type_of_business",
+   "fieldtype": "Data",
+   "label": "Type of Business"
   }
  ],
  "icon": "fa fa-user",
  "idx": 5,
  "image_field": "image",
- "modified": "2020-08-21 05:35:26.829924",
+ "modified": "2020-09-21 03:04:52.441048",
  "modified_by": "Administrator",
  "module": "CRM",
  "name": "Lead",

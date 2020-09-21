@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "autoname": "naming_series:",
  "creation": "2013-05-24 19:29:05",
@@ -24,6 +23,7 @@
   "set_posting_time",
   "due_date",
   "amended_from",
+  "license",
   "returns",
   "return_against",
   "column_break_21",
@@ -346,7 +346,8 @@
    "label": "Payment Due Date",
    "no_copy": 1,
    "oldfieldname": "due_date",
-   "oldfieldtype": "Date"
+   "oldfieldtype": "Date",
+   "print_hide": 1
   },
   {
    "fieldname": "amended_from",
@@ -1342,6 +1343,7 @@
    "width": "50%"
   },
   {
+   "allow_on_submit": 1,
    "default": "Draft",
    "fieldname": "status",
    "fieldtype": "Select",
@@ -1349,8 +1351,7 @@
    "label": "Status",
    "no_copy": 1,
    "options": "\nDraft\nReturn\nCredit Note Issued\nSubmitted\nPaid\nUnpaid\nUnpaid and Discounted\nOverdue and Discounted\nOverdue\nCancelled",
-   "print_hide": 1,
-   "read_only": 1
+   "print_hide": 1
   },
   {
    "fieldname": "source",
@@ -1571,13 +1572,18 @@
    "fieldtype": "Select",
    "label": "Order Type",
    "options": "\nSales\nMaintenance\nShopping Cart\nPromotional\nSample\nPAD\nWarranty\nConsignment\nReplenishment\nMarketing"
+  },
+  {
+   "fieldname": "license",
+   "fieldtype": "Link",
+   "label": "License",
+   "options": "Compliance Info"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 181,
  "is_submittable": 1,
- "links": [],
- "modified": "2020-07-16 06:13:14.139976",
+ "modified": "2020-09-20 23:44:36.950882",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Sales Invoice",

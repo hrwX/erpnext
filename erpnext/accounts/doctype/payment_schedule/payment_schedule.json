@@ -1,5 +1,4 @@
 {
- "actions": [],
  "creation": "2017-08-10 15:38:00.080575",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -8,6 +7,8 @@
   "payment_term",
   "description",
   "due_date",
+  "is_billed",
+  "column_break_5",
   "invoice_portion",
   "payment_amount",
   "mode_of_payment",
@@ -31,6 +32,7 @@
    "label": "Description"
   },
   {
+   "allow_on_submit": 1,
    "columns": 2,
    "fieldname": "due_date",
    "fieldtype": "Date",
@@ -65,11 +67,19 @@
    "fieldname": "paid_amount",
    "fieldtype": "Currency",
    "label": "Paid Amount"
+  },
+  {
+   "fieldname": "is_billed",
+   "fieldtype": "Data",
+   "label": "Is Billed"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
   }
  ],
  "istable": 1,
- "links": [],
- "modified": "2020-03-13 17:58:24.729526",
+ "modified": "2020-09-20 23:21:54.670832",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Payment Schedule",

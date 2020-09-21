@@ -1,7 +1,6 @@
 {
- "actions": [],
  "allow_import": 1,
- "autoname": "naming_series:",
+ "autoname": "field:item_name",
  "creation": "2013-01-10 16:34:16",
  "doctype": "DocType",
  "document_type": "Setup",
@@ -14,6 +13,7 @@
   "item_name",
   "image",
   "bom_no",
+  "title",
   "column_break1",
   "company",
   "qty",
@@ -110,7 +110,8 @@
    "fieldname": "item_name",
    "fieldtype": "Data",
    "label": "Item Name",
-   "read_only": 1
+   "read_only": 1,
+   "unique": 1
   },
   {
    "fetch_from": "production_item.image",
@@ -138,7 +139,7 @@
    "label": "Allow Alternative Item"
   },
   {
-   "default": "1",
+   "default": "0",
    "description": "Plan material for sub-assemblies",
    "fieldname": "use_multi_level_bom",
    "fieldtype": "Check",
@@ -171,6 +172,7 @@
   {
    "fieldname": "qty",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Qty To Manufacture",
    "oldfieldname": "qty",
    "oldfieldtype": "Currency",
@@ -463,14 +465,18 @@
    "fieldname": "update_consumed_material_cost_in_project",
    "fieldtype": "Check",
    "label": "Update Consumed Material Cost In Project"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title"
   }
  ],
  "icon": "fa fa-cogs",
  "idx": 1,
  "image_field": "image",
  "is_submittable": 1,
- "links": [],
- "modified": "2019-12-04 11:20:04.695123",
+ "modified": "2020-09-21 03:26:24.453048",
  "modified_by": "Administrator",
  "module": "Manufacturing",
  "name": "Work Order",

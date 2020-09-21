@@ -178,7 +178,7 @@
    "no_copy": 1,
    "oldfieldname": "naming_series",
    "oldfieldtype": "Select",
-   "options": "MAT-DN-.YYYY.-",
+   "options": "DN-\nDN-RET-",
    "print_hide": 1,
    "reqd": 1,
    "set_only_once": 1
@@ -845,6 +845,7 @@
    "oldfieldname": "rounded_total_export",
    "oldfieldtype": "Currency",
    "options": "currency",
+   "print_hide": 1,
    "print_width": "150px",
    "read_only": 1,
    "width": "150px"
@@ -856,7 +857,6 @@
    "label": "In Words",
    "oldfieldname": "in_words_export",
    "oldfieldtype": "Data",
-   "print_hide": 1,
    "print_width": "150px",
    "read_only": 1,
    "width": "150px"
@@ -952,6 +952,7 @@
    "default": "Today",
    "fieldname": "lr_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Transport Receipt Date",
    "oldfieldname": "lr_date",
    "oldfieldtype": "Date",
@@ -1022,6 +1023,7 @@
   {
    "fieldname": "territory",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Territory",
    "options": "Territory",
    "print_hide": 1
@@ -1112,7 +1114,6 @@
    "description": "% of materials delivered against this Delivery Note",
    "fieldname": "per_installed",
    "fieldtype": "Percent",
-   "in_list_view": 1,
    "label": "% Installed",
    "no_copy": 1,
    "oldfieldname": "per_installed",
@@ -1280,7 +1281,7 @@
  "icon": "fa fa-truck",
  "idx": 146,
  "is_submittable": 1,
- "modified": "2020-08-14 05:17:18.750711",
+ "modified": "2020-09-21 04:35:40.373488",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Delivery Note",

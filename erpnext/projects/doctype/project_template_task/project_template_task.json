@@ -9,6 +9,7 @@
   "duration",
   "task_weight",
   "assigned_user",
+  "billable",
   "description"
  ],
  "fields": [
@@ -49,10 +50,16 @@
    "fieldtype": "Link",
    "label": "Assigned User",
    "options": "User"
+  },
+  {
+   "default": "0",
+   "fieldname": "billable",
+   "fieldtype": "Check",
+   "label": "Billable"
   }
  ],
  "istable": 1,
- "modified": "2020-09-01 00:55:10.893286",
+ "modified": "2020-09-21 03:31:31.917906",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Project Template Task",

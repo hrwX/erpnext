@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
  "creation": "2013-03-07 18:50:32",
@@ -16,6 +15,10 @@
   "column_break_4",
   "account",
   "warehouse_type",
+  "warehouse_party_details_section",
+  "customer",
+  "column_break_11",
+  "supplier",
   "address_and_contact",
   "address_html",
   "column_break_10",
@@ -224,13 +227,33 @@
    "fieldtype": "Link",
    "label": "Warehouse Type",
    "options": "Warehouse Type"
+  },
+  {
+   "fieldname": "warehouse_party_details_section",
+   "fieldtype": "Section Break",
+   "label": "Warehouse Party Details"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
   }
  ],
  "icon": "fa fa-building",
  "idx": 1,
  "is_tree": 1,
- "links": [],
- "modified": "2020-03-18 18:26:00.479541",
+ "modified": "2020-09-21 05:02:34.998008",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Warehouse",

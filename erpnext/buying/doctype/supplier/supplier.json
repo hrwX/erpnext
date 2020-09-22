@@ -15,7 +15,6 @@
   "country",
   "default_bank_account",
   "tax_id",
-  "irs_1099",
   "tax_category",
   "tax_withholding_category",
   "is_transporter",
@@ -384,12 +383,6 @@
    "label": "Allow Purchase Invoice Creation Without Purchase Receipt"
   },
   {
-   "default": "0",
-   "fieldname": "irs_1099",
-   "fieldtype": "Check",
-   "label": "Is IRS 1099 reporting required for supplier?"
-  },
-  {
    "fieldname": "licenses_section",
    "fieldtype": "Section Break",
    "label": "Licenses"
@@ -404,7 +397,7 @@
  "icon": "fa fa-user",
  "idx": 370,
  "image_field": "image",
- "modified": "2020-09-21 01:56:15.267110",
+ "modified": "2020-09-22 18:03:02.871200",
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Supplier",

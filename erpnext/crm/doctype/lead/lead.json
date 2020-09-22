@@ -7,7 +7,6 @@
  "document_type": "Document",
  "engine": "InnoDB",
  "field_order": [
-  "hub_sync_id",
   "organization_lead",
   "lead_dashboard_section",
   "region",
@@ -443,12 +442,6 @@
    "label": "Contact"
   },
   {
-   "fieldname": "hub_sync_id",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Hub Sync ID"
-  },
-  {
    "fieldname": "lead_dashboard_section",
    "fieldtype": "Section Break",
    "label": "Lead Dashboard"
@@ -482,7 +475,7 @@
  "icon": "fa fa-user",
  "idx": 5,
  "image_field": "image",
- "modified": "2020-09-22 15:38:33.237741",
+ "modified": "2020-09-22 18:05:20.241450",
  "modified_by": "Administrator",
  "module": "CRM",
  "name": "Lead",

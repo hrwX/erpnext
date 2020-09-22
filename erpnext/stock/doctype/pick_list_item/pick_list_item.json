@@ -181,7 +181,7 @@
    "fieldname": "package_tag",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Package Tag",
+   "label": "Outgoing Transfer Package Tag",
    "options": "Package Tag"
   }
  ],

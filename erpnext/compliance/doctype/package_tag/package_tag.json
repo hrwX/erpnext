@@ -81,7 +81,6 @@
   {
    "fieldname": "source_package_tag",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Source Package Tag",
    "no_copy": 1,
    "options": "Package Tag",
@@ -113,7 +112,7 @@
    "options": "Compliance UOM"
   }
  ],
- "modified": "2020-09-21 02:00:51.466136",
+ "modified": "2020-09-21 05:23:56.830803",
  "modified_by": "Administrator",
  "module": "Compliance",
  "name": "Package Tag",

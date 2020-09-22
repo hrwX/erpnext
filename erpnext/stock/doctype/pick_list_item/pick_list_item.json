@@ -28,9 +28,7 @@
   "sales_order",
   "sales_order_item",
   "material_request",
-  "material_request_item",
-  "column_break_26",
-  "so_customer"
+  "material_request_item"
  ],
  "fields": [
   {
@@ -185,20 +183,10 @@
    "in_list_view": 1,
    "label": "Package Tag",
    "options": "Package Tag"
-  },
-  {
-   "fieldname": "column_break_26",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "sales_order.customer",
-   "fieldname": "so_customer",
-   "fieldtype": "Data",
-   "label": "SO Customer"
   }
  ],
  "istable": 1,
- "modified": "2020-09-21 05:45:55.472088",
+ "modified": "2020-09-22 17:32:07.267986",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Pick List Item",

@@ -218,14 +218,15 @@
    "fetch_from": "item.item_group",
    "fieldname": "item_group",
    "fieldtype": "Data",
-   "label": "Item Group"
+   "label": "Item Group",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-archive",
  "idx": 1,
  "image_field": "image",
  "max_attachments": 5,
- "modified": "2020-09-21 04:31:16.526391",
+ "modified": "2020-09-22 17:04:32.618792",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Batch",

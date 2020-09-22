@@ -1121,20 +1121,6 @@ def create_sales_invoice_against_contract():
 		sales_invoice = make_sales_invoice(order.name)
 		sales_invoice.save()
 
-def check_overdue_status(sales_order, method=None):
-	overdue_conditions = [
-		sales_order.docstatus == 1,
-		sales_order.status not in ["On Hold", "Closed", "Completed"],
-		sales_order.skip_delivery_note == 0,
-		flt(sales_order.per_delivered, 6) < 100,
-		getdate(sales_order.delivery_date) < getdate(today()),
-	]
-
-	is_overdue = all(overdue_conditions)
-	if is_overdue != sales_order.is_overdue:
-		sales_order.db_set("is_overdue", is_overdue)
-
-
 def update_order_status():
 	"""
 		Daily scheduler to check if a Sales Order has become overdue
@@ -1142,7 +1128,7 @@ def update_order_status():
 	orders = frappe.get_all("Sales Order", filters={"docstatus": 1})
 
 	for order in orders:
-		check_overdue_status(frappe.get_doc("Sales Order", order))
+		frappe.get_doc("Sales Order", order).check_overdue_status()
 
 @frappe.whitelist()
 def create_multiple_pick_lists(orders):
@@ -1177,7 +1163,7 @@ def create_multiple_pick_lists(orders):
 		created_orders.append({
 			"sales_order": order,
 			"customer": customer,
-			"pick_lists": pick_lists,
+			"pick_list": pick_lists,
 			"created": created
 		})
 
@@ -1216,7 +1202,7 @@ def create_multiple_sales_invoices(orders):
 		created_orders.append({
 			"sales_order": order,
 			"customer": customer,
-			"sales_invoices": sales_invoices,
+			"sales_invoice": sales_invoices,
 			"created": created
 		})
 
@@ -1255,7 +1241,7 @@ def create_muliple_delivery_notes(orders):
 		created_orders.append({
 			"sales_order": order,
 			"customer": customer,
-			"delivery_notes": delivery_notes,
+			"delivery_note": delivery_notes,
 			"created": created
 		})
 

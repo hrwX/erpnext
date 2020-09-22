@@ -8,8 +8,8 @@ import json
 import erpnext
 import frappe
 import copy
-from erpnext.controllers.item_variant import (ItemVariantExistsError,
-		copy_attributes_to_variant, get_variant, make_variant_item_code, validate_item_variant_attributes)
+from erpnext.controllers.item_variant import (ItemVariantExistsError, copy_attributes_to_variant, get_variant,
+	make_variant_item_code, validate_item_variant_attributes)
 from erpnext.setup.doctype.item_group.item_group import (get_parent_item_groups, invalidate_cache_for)
 from frappe import _, msgprint
 from frappe.utils import cint, cstr, flt, formatdate, get_timestamp, getdate, now_datetime, random_string, strip
@@ -22,7 +22,7 @@ from six import iteritems, string_types
 from erpnext import get_default_company
 from erpnext.accounts.utils import get_company_default
 from frappe.utils import cstr
-
+from erpnext.utilities.utils import get_abbr
 
 class DuplicateReorderRows(frappe.ValidationError):
 	pass
@@ -1165,42 +1165,3 @@ def toggle_variants_website_display(item_name, value):
 def on_doctype_update():
 	# since route is a Text column, it needs a length for indexing
 	frappe.db.add_index("Item", ["route(500)"])
-
-def get_abbr(txt, max_length=2):
-	"""
-		Extract abbreviation from the given string as:
-			- Single-word strings abbreviate to the letters of the string, upto the max length
-			- Multi-word strings abbreviate to the initials of each word, upto the max length
-
-	Args:
-		txt (str): The string to abbreviate
-		max_length (int, optional): The max length of the abbreviation. Defaults to 2.
-
-	Returns:
-		str: The abbreviated string, in uppercase
-	"""
-
-	if not txt:
-		return
-
-	if not isinstance(txt, string_types):
-		try:
-			txt = str(txt)
-		except:
-			return
-
-	abbr = ""
-	words = txt.split(" ")
-
-	if len(words) > 1:
-		for word in words:
-			if len(abbr) >= max_length:
-				break
-
-			if word.strip():
-				abbr += word.strip()[0]
-	else:
-		abbr = txt[:max_length]
-
-	abbr = abbr.upper()
-	return abbr

@@ -48,7 +48,6 @@ class Contract(Document):
 		self.update_contract_status()
 		self.update_fulfilment_status()
 
-
 	def on_update_after_submit(self):
 		self.create_project_against_contract()
 		self.create_order_against_contract()
@@ -88,7 +87,6 @@ class Contract(Document):
 			}).insert(ignore_permissions=True)
 
 			project_dates.extend([p_task.start_date, p_task.end_date])
-
 
 		project.update({
 			"expected_start_date": min(project_dates),

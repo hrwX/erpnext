@@ -773,13 +773,13 @@
   {
    "fieldname": "batch_no",
    "fieldtype": "Link",
-   "label": "Batch",
+   "label": "COA Batch",
    "options": "Batch"
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2020-09-21 03:48:37.481360",
+ "modified": "2020-09-23 13:20:48.876812",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Sales Order Item",

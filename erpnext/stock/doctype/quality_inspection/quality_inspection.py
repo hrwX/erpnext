@@ -212,6 +212,7 @@ def make_quality_inspections(items):
 			"item_code": item.get("item_code"),
 			"sample_size": item.get("sample_size"),
 			"batch_no": item.get("batch_no"),
+			"package_tag":item.get("package_tag"),
 			"inspected_by": frappe.session.user,
 			"inspection_by": "Internal",
 			"quality_inspection_template": frappe.db.get_value('BOM', item.get("item_code"), 'quality_inspection_template')

@@ -830,13 +830,13 @@
   {
    "fieldname": "package_tag",
    "fieldtype": "Link",
-   "label": "Package Tag",
+   "label": "Incoming Package Tag",
    "options": "Package Tag"
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2020-09-22 00:26:04.953070",
+ "modified": "2020-09-25 04:31:02.531616",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Purchase Receipt Item",

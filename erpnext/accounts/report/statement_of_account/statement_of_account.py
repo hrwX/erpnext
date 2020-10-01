@@ -9,6 +9,7 @@ from frappe import _, _dict
 from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import get_accounting_dimensions, get_dimension_with_children
 from collections import OrderedDict
 from erpnext.accounts.report.general_ledger.general_ledger import validate_party, set_account_currency, get_totals_dict, get_balance
+from frappe.contacts.doctype.address.address import get_default_address
 
 def execute(filters=None):
 	if not filters:
@@ -132,15 +133,11 @@ def get_data_with_opening_closing(filters, account_details, gl_entries):
 
 	totals, entries = get_accountwise_gle(filters, gl_entries, gle_map)
 
-	# Opening for filtered account
-	data.append(totals.opening)
 	data += entries
 
 	# totals
 	data.append(totals.total)
 
-	# closing
-	data.append(totals.closing)
 	return data
 
 def initialize_gle_map(gl_entries, filters):
@@ -198,7 +195,7 @@ def get_accountwise_gle(filters, gl_entries, gle_map):
 
 def get_result_as_list(data, filters):
 	balance = 0
-	
+
 	for d in data:
 		if not d.get('posting_date'):
 			balance = 0
@@ -264,3 +261,16 @@ def get_columns(filters):
 		}
 	]
 	return columns
+
+@frappe.whitelist()
+def get_addresses(company=None, party_type=None, party=None):
+	if not (company and party_type and party):
+		return {}
+
+	company_addr = frappe.get_doc("Address", get_default_address("Company", company))
+	party_addr = frappe.get_doc("Address", get_default_address(party_type, party))
+
+	return {
+		"company": company_addr,
+		"party": party_addr
+	}

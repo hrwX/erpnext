@@ -6,6 +6,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "company",
   "party_type",
   "company",
   "is_signed",
@@ -13,6 +14,7 @@
   "party_name",
   "employee_name",
   "party_user",
+  "party_address",
   "status",
   "fulfilment_status",
   "signature_section",
@@ -39,10 +41,15 @@
   "requires_fulfilment",
   "fulfilment_deadline",
   "fulfilment_terms",
+  "sb_signee",
+  "signee",
+  "signed_on",
+  "cb_user",
   "authorised_by_section",
-  "signee_company",
   "signed_by_company",
   "signed_by_company_date",
+  "column_break_26",
+  "signee_company",
   "sb_references",
   "document_type",
   "letter_head",
@@ -267,6 +274,21 @@
    "label": "Authorised By"
   },
   {
+   "fieldname": "column_break_26",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "party_address",
+   "fieldtype": "Small Text",
+   "label": "Party Address"
+  },
+  {
    "allow_on_submit": 1,
    "fieldname": "letter_head",
    "fieldtype": "Link",
@@ -340,7 +362,8 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2020-09-21 02:39:31.856949",
+ "links": [],
+ "modified": "2020-09-24 03:55:18.798485",
  "modified_by": "Administrator",
  "module": "CRM",
  "name": "Contract",

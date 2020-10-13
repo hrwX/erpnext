@@ -68,14 +68,14 @@ class TestSubscription(unittest.TestCase):
 		subscription.party_type = 'Customer'
 		subscription.party = '_Test Customer'
 		subscription.trial_period_start = nowdate()
-		subscription.trial_period_end = add_days(nowdate(), 30)
+		subscription.trial_period_end = add_months(nowdate(), 1)
 		subscription.append('plans', {'plan': '_Test Plan Name', 'qty': 1})
 		subscription.save()
 
 		self.assertEqual(subscription.trial_period_start, nowdate())
-		self.assertEqual(subscription.trial_period_end, add_days(nowdate(), 30))
+		self.assertEqual(subscription.trial_period_end, add_months(nowdate(), 1))
 		self.assertEqual(add_days(subscription.trial_period_end, 1), get_date_str(subscription.current_invoice_start))
-		self.assertEqual(add_days(subscription.current_invoice_start, 30), get_date_str(subscription.current_invoice_end))
+		self.assertEqual(add_to_date(subscription.current_invoice_start, months=1, days=-1), get_date_str(subscription.current_invoice_end))
 		self.assertEqual(subscription.invoices, [])
 		self.assertEqual(subscription.status, 'Trialling')
 
@@ -631,5 +631,3 @@ class TestSubscription(unittest.TestCase):
 
 		subscription.process()
 		self.assertEqual(len(subscription.invoices), 1)
-
-

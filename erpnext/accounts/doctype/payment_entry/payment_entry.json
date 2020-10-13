@@ -198,6 +198,7 @@
    "depends_on": "party",
    "fieldname": "party_balance",
    "fieldtype": "Currency",
+   "in_list_view": 1,
    "label": "Party Balance",
    "print_hide": 1,
    "read_only": 1
@@ -575,7 +576,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2020-09-24 10:05:23.482377",
+ "modified": "2020-10-07 05:15:49.671046",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Payment Entry",

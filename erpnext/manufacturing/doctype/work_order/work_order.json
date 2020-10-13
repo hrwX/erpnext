@@ -14,8 +14,10 @@
   "image",
   "bom_no",
   "title",
+  "manufacturing_type",
   "column_break1",
   "company",
+  "raw_material_qty",
   "qty",
   "material_transferred_for_manufacturing",
   "produced_qty",
@@ -470,6 +472,18 @@
    "fieldname": "title",
    "fieldtype": "Data",
    "label": "Title"
+  },
+  {
+   "fieldname": "manufacturing_type",
+   "fieldtype": "Select",
+   "label": "Manufacturing Type",
+   "options": "\nDiscrete\nProcess"
+  },
+  {
+   "depends_on": "eval:doc.manufacturing_type  == \"Process\"",
+   "fieldname": "raw_material_qty",
+   "fieldtype": "Float",
+   "label": "Raw Material Quantity"
   }
  ],
  "icon": "fa fa-cogs",

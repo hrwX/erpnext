@@ -6,6 +6,6 @@ import frappe
 
 def execute():
 
-	for cf in ["Delivery Note-column_break_17", "Delivery Note-map_html", "Delivery Note-odometer", "Delivery Note-sb_map"]:
+	for cf in ["Delivery Trip-column_break_17", "Delivery Trip-map_html", "Delivery Trip-odometer", "Delivery Trip-sb_map"]:
 		if frappe.db.exists("Custom Field", cf):
 			frappe.delete_doc_if_exists("Custom Field", cf)

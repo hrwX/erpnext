@@ -698,3 +698,4 @@ erpnext.patches.v13_0.update_item_master_doctype_field
 erpnext.patches.v13_0.update_billed_qty_in_purchase_receipt
 erpnext.patches.v13_0.update_subscription
 execute:frappe.delete_doc_if_exists('DocType', 'Compliance Item')
+erpnext.patches.v12_0.remove_dt_custom_fields

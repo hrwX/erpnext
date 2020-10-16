@@ -139,7 +139,7 @@ frappe.ui.form.on('Delivery Trip', {
 					} else {
 						frappe.prompt({
 							"label": "Odometer Start Value",
-							"fieldtype": "Int",
+							"fieldtype": "Float",
 							"fieldname": "odometer_start_value",
 							"reqd": 1
 						},
@@ -215,7 +215,7 @@ frappe.ui.form.on('Delivery Trip', {
 		frm.add_custom_button(__("End"), () => {
 			frappe.prompt({
 				"label": "Odometer End Value",
-				"fieldtype": "Int",
+				"fieldtype": "Float",
 				"fieldname": "odometer_end_value",
 				"reqd": 1,
 				"default": frm.doc.odometer_start_value

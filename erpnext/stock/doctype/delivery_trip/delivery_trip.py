@@ -32,15 +32,19 @@ class DeliveryTrip(Document):
 		self.link_invoice_against_trip()
 
 	def on_submit(self):
-		self.update_status()
 		self.update_delivery_notes()
 
-	def on_update_after_submit(self):
+	def before_submit(self):
 		self.update_status()
 		self.set_vehicle_last_odometer_value()
 
-	def on_cancel(self):
+	def before_update_after_submit(self):
 		self.update_status()
+
+	def before_cancel(self):
+		self.update_status()
+
+	def on_cancel(self):
 		self.update_delivery_notes(delete=True)
 
 	def update_package_total(self):
@@ -65,8 +69,7 @@ class DeliveryTrip(Document):
 			elif any(visited_stops):
 				status = "In Transit"
 
-		self.db_set("status", status)
-
+		self.status = status
 	def update_delivery_notes(self, delete=False):
 		"""
 		Update all connected Delivery Notes with Delivery Trip details
@@ -506,6 +509,7 @@ def get_driver_email(driver):
 @frappe.whitelist()
 def create_or_update_timesheet(trip, action, odometer_value=None):
 	delivery_trip = frappe.get_doc("Delivery Trip", trip)
+	delivery_trip.flags.ignore_validate_update_after_submit = True
 	time = frappe.utils.now()
 
 	def get_timesheet():
@@ -525,9 +529,9 @@ def create_or_update_timesheet(trip, action, odometer_value=None):
 		})
 		timesheet.save()
 
-		frappe.db.set_value("Delivery Trip", trip, "status", "In Transit", update_modified=False)  # Because we can't set status as allow on submit
-		frappe.db.set_value("Delivery Trip", trip, "odometer_start_value", odometer_value, update_modified=False)
-		frappe.db.set_value("Delivery Trip", trip, "odometer_start_time", time, update_modified=False)
+		delivery_trip.status = "In Transit"
+		delivery_trip.odometer_start_value = odometer_value
+		delivery_trip.odometer_start_time = time
 	elif action == "pause":
 		timesheet = get_timesheet()
 
@@ -539,7 +543,7 @@ def create_or_update_timesheet(trip, action, odometer_value=None):
 					last_timelog.to_time = time
 					timesheet.save()
 
-		frappe.db.set_value("Delivery Trip", trip, "status", "Paused", update_modified=False)
+		delivery_trip.status = "Paused"
 	elif action == "continue":
 		timesheet = get_timesheet()
 
@@ -554,7 +558,7 @@ def create_or_update_timesheet(trip, action, odometer_value=None):
 					})
 					timesheet.save()
 
-		frappe.db.set_value("Delivery Trip", trip, "status", "In Transit", update_modified=False)
+		delivery_trip.status = "In Transit"
 	elif action == "end":
 		timesheet = get_timesheet()
 
@@ -566,13 +570,13 @@ def create_or_update_timesheet(trip, action, odometer_value=None):
 				timesheet.save()
 				timesheet.submit()
 
-		frappe.db.set_value("Delivery Trip", trip, "status", "Completed", update_modified=False)
-		frappe.db.set_value("Delivery Trip", trip, "odometer_end_value", odometer_value, update_modified=False)
-		frappe.db.set_value("Delivery Trip", trip, "odometer_end_time", time, update_modified=False)
+		
+		delivery_trip.status = "Completed"
+		delivery_trip.odometer_end_value = odometer_value
+		delivery_trip.odometer_end_time = time
 
-		start_value = frappe.db.get_value("Delivery Trip", trip, "odometer_start_value")
-		frappe.db.set_value("Delivery Trip", trip, "actual_distance_travelled", flt(odometer_value) - start_value, update_modified=False)
-
+		delivery_trip.actual_distance_travelled = flt(odometer_value) - delivery_trip.odometer_start_value
+	delivery_trip.save()
 
 @frappe.whitelist()
 def make_payment_entry(payment_amount, sales_invoice):

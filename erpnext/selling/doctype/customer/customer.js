@@ -7,15 +7,19 @@ frappe.ui.form.on("Customer", {
 		frm.make_methods = {
 			'Quotation': () => frappe.model.open_mapped_doc({
 				method: 'erpnext.selling.doctype.customer.customer.make_quotation',
-				frm: cur_frm
+				frm: frm
 			}),
 			'Opportunity': () => frappe.model.open_mapped_doc({
 				method: 'erpnext.selling.doctype.customer.customer.make_opportunity',
-				frm: cur_frm
+				frm: frm
 			}),
 			'Contract': () => frappe.model.open_mapped_doc({
 				method: 'erpnext.selling.doctype.customer.customer.make_contract',
-				frm: cur_frm
+				frm: frm
+			}),
+			'Subscription': () => frappe.model.open_mapped_doc({
+				method: 'erpnext.selling.doctype.customer.customer.make_subscription',
+				frm: frm
 			})
 		}
 

@@ -11,7 +11,8 @@ def get_data():
 		'non_standard_fieldnames': {
 			'Payment Entry': 'party_name',
 			'Bank Account': 'party',
-			'Contract': 'party_name'
+			'Contract': 'party_name',
+			'Subscription': 'party'
 		},
 		'transactions': [
 			{
@@ -37,6 +38,10 @@ def get_data():
 			{
 				'label': _('Contracts'),
 				'items': ['Contract']
+			},
+			{
+				'label': _('Subscriptions'),
+				'items': ['Subscription']
 			}
 		]
 	}

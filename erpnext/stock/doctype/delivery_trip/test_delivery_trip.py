@@ -82,12 +82,14 @@ class TestDeliveryTrip(unittest.TestCase):
 		self.assertEqual(self.delivery_trip.status, "Cancelled")
 
 	def test_delivery_trip_status_in_transit(self):
+		self.delivery_trip.flags.ignore_validate_update_after_submit = True
 		self.delivery_trip.submit()
 		self.delivery_trip.delivery_stops[0].visited = 1
 		self.delivery_trip.save()
 		self.assertEqual(self.delivery_trip.status, "In Transit")
 
 	def test_delivery_trip_status_completed(self):
+		self.delivery_trip.flags.ignore_validate_update_after_submit = True
 		self.delivery_trip.submit()
 
 		for stop in self.delivery_trip.delivery_stops:

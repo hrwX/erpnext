@@ -6,7 +6,11 @@ frappe.ui.form.on("Supplier", {
 		frm.make_methods = {
 			'Contract': () => frappe.model.open_mapped_doc({
 				method: 'erpnext.buying.doctype.supplier.supplier.make_contract',
-				frm: cur_frm
+				frm: frm
+			}),
+			'Subscription': () => frappe.model.open_mapped_doc({
+				method: 'erpnext.buying.doctype.supplier.supplier.make_subscription',
+				frm: frm
 			})
 		}
 

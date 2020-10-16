@@ -51,6 +51,12 @@ frappe.ui.form.on("Purchase Order", {
 	},
 
 	onload: function(frm) {
+		if (frm.is_new()){
+			frm.get_field("items").grid.remove_all()
+		}
+		// add item, if previous view was item
+		erpnext.utils.add_item(frm);
+
 		set_schedule_date(frm);
 		if (!frm.doc.transaction_date){
 			frm.set_value('transaction_date', frappe.datetime.get_today())

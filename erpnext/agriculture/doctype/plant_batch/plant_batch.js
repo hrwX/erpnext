@@ -43,7 +43,7 @@ frappe.ui.form.on('Plant Batch', {
 		if (!frm.is_new()) {
 			frm.add_custom_button(__("Plant Batch"), () => {
 				frm.trigger("split_plant_batch");
-			}, __("Create"));
+			}, __("Split"));
 		}
 	},
 

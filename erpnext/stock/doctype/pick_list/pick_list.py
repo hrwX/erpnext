@@ -395,12 +395,16 @@ def create_delivery_note(source_name, target_doc=None):
 			else [location, item_table_mapper_without_so]
 
 		dn_item = map_child_doc(source_doc, delivery_note, table_mapper)
-
+		coa_batch = None
+		if location.source_package_tag:
+			coa_batch = frappe.db.get_value("Package Tag", location.source_package_tag, "coa_batch_no")
+			
 		if dn_item:
 			dn_item.warehouse = location.warehouse
 			dn_item.qty = location.picked_qty
 			dn_item.batch_no = location.batch_no
 			dn_item.serial_no = location.serial_no
+			dn_item.coa_batch = coa_batch
 
 			update_delivery_note_item(source_doc, dn_item, delivery_note)
 

@@ -73,3 +73,16 @@ def make_contract(source_name, target_doc=None):
 		}}, target_doc)
 
 	return target_doc
+
+@frappe.whitelist()
+def make_subscription(source_name, target_doc=None):
+	target_doc = get_mapped_doc("Supplier", source_name,
+		{"Supplier": {
+			"doctype": "Subscription",
+			"field_map": {
+				"doctype": "party_type",
+				"name": "party"
+			}
+		}}, target_doc)
+
+	return target_doc

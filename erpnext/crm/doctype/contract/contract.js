@@ -21,7 +21,7 @@ frappe.ui.form.on("Contract", {
 					"party_type": doc.party_type,
 					"party_name": doc.party_name
 				}
-			}
+			};
 		});
 
 		if (frm.doc.docstatus === 1 && !frm.doc.customer_signature) {
@@ -54,19 +54,18 @@ frappe.ui.form.on("Contract", {
 						},
 						callback: (r) => {
 							if (!r.exc) {
-								frappe.msgprint(__(`{0} has been successfully sent to {1}.`, [frm.doc.name, data.contact_email]))
+								frappe.msgprint(__(`{0} has been successfully sent to {1}.`, [frm.doc.name, data.contact_email]));
 							}
 						}
-					})
-				},
-				__("Send Authorization Request"))
+					});
+				}, __("Send Authorization Request"));
 			}).addClass("btn-primary");
 		}
 	},
 	before_submit: function (frm) {
 		if(!frm.doc.signee_company) {
 			frm.scroll_to_field('signee_company');
-			frappe.throw("Please sign the contract before submiting it.")
+			frappe.throw("Please sign the contract before submiting it.");
 		}
 	},
 	signee_company: function (frm) {

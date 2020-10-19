@@ -394,8 +394,6 @@ def make_investor(source_name, target_doc=None):
 
 @frappe.whitelist()
 def filter_territory(doctype, txt, searchfield, start, page_len, filters):
-	"""filter territory"""
-
 	territory_list = get_descendants_of("Territory", filters.get("region"))
 	territory_list.append(filters.get("region"))
 

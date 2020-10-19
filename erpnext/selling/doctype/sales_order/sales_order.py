@@ -23,7 +23,6 @@ from erpnext.manufacturing.doctype.production_plan.production_plan import get_it
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import validate_inter_company_party, update_linked_doc,\
 	unlink_inter_company_doc
 from erpnext.stock.doctype.batch.batch import get_batch_qty
-from frappe.utils.user import get_users_with_role
 from erpnext.stock.doctype.delivery_note.delivery_note import validate_delivery_window
 
 form_grid_templates = {
@@ -1111,7 +1110,6 @@ def create_sales_invoice_against_contract():
 		Daily scheduler event to create Sales Invoice against
 		an active contract, based on the contract's payment terms
 	"""
-
 	sales_orders = frappe.get_all("Sales Order", filters={
 		"docstatus": 1,
 		"contract": ["not like", ""],

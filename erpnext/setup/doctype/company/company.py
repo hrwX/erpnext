@@ -597,7 +597,6 @@ def get_default_company_address(name, sort_key='is_primary_address', existing_ad
 
 def validate_default_license(doc):
 	"""allow to set only one default license for supplier or customer"""
-
 	# remove duplicate licenses
 	unique_licenses = unique([license.license for license in doc.licenses])
 
@@ -617,7 +616,6 @@ def validate_default_license(doc):
 
 def validate_expired_licenses(doc):
 	"""remove expired licenses from company, customer and supplier records"""
-
 	for row in doc.licenses:
 		if row.license_expiry_date and row.license_expiry_date < getdate(today()):
 			expired_since = date_diff(getdate(today()), getdate(row.license_expiry_date))

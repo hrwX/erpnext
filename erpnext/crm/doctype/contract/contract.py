@@ -8,7 +8,7 @@ import frappe
 import json
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import getdate, now_datetime, nowdate, now, add_days
+from frappe.utils import getdate, nowdate, now, add_days
 from frappe.utils.jinja import render_template
 from erpnext.selling.doctype.quotation.quotation import make_sales_order
 from erpnext import get_default_company
@@ -250,14 +250,12 @@ def get_events(start, end, filters=None):
 			(start_date <= %(end)s
 				AND end_date >= %(start)s)
 				AND docstatus < 2
-				{conditions}
-		""".format(conditions=conditions), {
+				%(conditions)s
+		""", {
 			"start": start,
-			"end": end
-		},
-		as_dict=True,
-		update={"allDay": 0}
-	)
+			"end": end,
+			"conditions": conditions
+		}, as_dict=True, update={"allDay": 0})
 	return events
 
 @frappe.whitelist()

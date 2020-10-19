@@ -60,8 +60,9 @@ frappe.listview_settings['Sales Order'] = {
 				if (doc.docstatus !== 1) {
 					frappe.throw(__("Cannot Email Draft or cancelled documents"));
 				}
+
 				if (doc.title !== title) {
-					frappe.throw(__("Select only one customer's sales orders"))
+					frappe.throw(__("Select only one customer's sales orders"));
 				}
 			};
 
@@ -180,8 +181,7 @@ function get_action(listview, dt, method) {
 
 						listview.refresh();
 					}
-				})
-			}
-		)
+				});
+			});
 	}
 }

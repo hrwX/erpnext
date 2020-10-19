@@ -33,9 +33,9 @@ frappe.listview_settings['Sales Invoice'] = {
 					frappe.throw(__("Cannot Email Draft or cancelled documents"));
 				}
 				if (doc.title !== title) {
-					frappe.throw(__("Select only one customer's sales invoice"))
+					frappe.throw(__("Select only one customer's sales invoice"));
 				}
-			};
+			}
 
 			frappe.call({
 				method: "erpnext.utilities.utils.get_contact",
@@ -57,7 +57,7 @@ frappe.listview_settings['Sales Invoice'] = {
 								recipients: r.message ? r.message.email_id : null,
 								message: res.message,
 								doc: {}
-							})
+							});
 						}
 					})
 				}

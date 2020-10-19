@@ -283,7 +283,7 @@ frappe.ui.form.on("Production Plan Item", {
 				frm.refresh_field("po_items");
 			});
 		}
-    }
+	}
 });
 
 frappe.ui.form.on("Material Request Plan Item", {

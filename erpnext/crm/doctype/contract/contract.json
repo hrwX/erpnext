@@ -8,7 +8,6 @@
  "field_order": [
   "company",
   "party_type",
-  "company",
   "is_signed",
   "cb_party",
   "party_name",
@@ -294,13 +293,6 @@
    "fieldtype": "Link",
    "label": "Letter Head",
    "options": "Letter Head"
-  },
-  {
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Company",
-   "options": "Company",
-   "read_only": 1
   },
   {
    "fieldname": "employee_name",

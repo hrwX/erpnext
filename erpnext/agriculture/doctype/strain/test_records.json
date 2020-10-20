@@ -68,6 +68,12 @@
 			"start_day": 15,
 			"end_day": 15,
 			"holiday_management": "Ignore holidays"
+		}],
+		"produced_items": [{
+			"item_code": "Basil Seeds",
+			"qty": "25",
+			"uom": "Nos",
+			"rate": "1"
 		}]
 	}
 ]

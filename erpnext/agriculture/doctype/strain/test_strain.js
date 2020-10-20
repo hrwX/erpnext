@@ -97,6 +97,17 @@ QUnit.test("test: Strain", function (assert) {
 				]
 			]}
 		]),
+		{produced_items: [
+			[
+				[
+					{item_code: 'Basil Seeds'},
+					{qty: '25'},
+					{uom: 'Nos'},
+					{rate: '1'}
+				],
+			]
+		]}
+	]),
 		// agriculture task list
 		() => {
 			assert.equal(cur_frm.doc.name, 'Basil from seed');

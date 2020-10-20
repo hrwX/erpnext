@@ -18,6 +18,7 @@
   "delivery_note_no",
   "sales_invoice_no",
   "pick_list",
+  "harvest",
   "purchase_receipt_no",
   "col2",
   "posting_date",
@@ -630,12 +631,19 @@
    "fieldtype": "Select",
    "label": "Manufacturing Type",
    "options": "\nDiscrete\nProcess"
+  },
+  {
+   "fieldname": "harvest",
+   "fieldtype": "Link",
+   "label": "Harvest",
+   "options": "Harvest",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 1,
  "is_submittable": 1,
- "modified": "2020-08-20 22:38:43.408633",
+ "modified": "2020-09-10 23:06:16.110675",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Stock Entry",

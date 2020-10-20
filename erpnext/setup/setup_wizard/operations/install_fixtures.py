@@ -95,6 +95,7 @@ def install(country=None):
 		{'doctype': 'Stock Entry Type', 'name': 'Material Consumption for Manufacture', 'purpose': 'Material Consumption for Manufacture'},
 		{'doctype': 'Stock Entry Type', 'name': 'Send to Warehouse', 'purpose': 'Send to Warehouse'},
 		{'doctype': 'Stock Entry Type', 'name': 'Receive at Warehouse', 'purpose': 'Receive at Warehouse'},
+		{'doctype': 'Stock Entry Type', 'name': 'Harvest', 'purpose': 'Material Receipt'},
 
 		# Designation
 		{'doctype': 'Designation', 'designation_name': _('CEO')},

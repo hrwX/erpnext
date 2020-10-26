@@ -699,3 +699,4 @@ erpnext.patches.v13_0.update_billed_qty_in_purchase_receipt
 erpnext.patches.v13_0.update_subscription
 execute:frappe.delete_doc_if_exists('DocType', 'Compliance Item')
 erpnext.patches.v13_0.harvest_stock_entry_type_added
+execute:frappe.delete_doc_if_exists('Custom Field', 'Stock Settings-autoname_item')

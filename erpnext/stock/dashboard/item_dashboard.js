@@ -26,13 +26,14 @@ erpnext.stock.ItemDashboard = Class.extend({
 
 		function handle_move_add(element, action) {
 			let item = unescape(element.attr('data-item'));
+			let uom = unescape(element.attr('data-stock_uom'));
 			let warehouse = unescape(element.attr('data-warehouse'));
 			let actual_qty = unescape(element.attr('data-actual_qty'));
 			let disable_quick_entry = Number(unescape(element.attr('data-disable_quick_entry')));
 			let entry_type = action === "Move" ? "Material Transfer": null;
 
 			if (disable_quick_entry) {
-				open_stock_entry(item, warehouse, entry_type);
+				open_stock_entry(item, warehouse, entry_type, uom);
 			} else {
 				if (action === "Add") {
 					let rate = unescape($(this).attr('data-rate'));
@@ -44,7 +45,7 @@ erpnext.stock.ItemDashboard = Class.extend({
 			}
 		}
 
-		function open_stock_entry(item, warehouse, entry_type) {
+		function open_stock_entry(item, warehouse, entry_type, uom) {
 			frappe.model.with_doctype('Stock Entry', function() {
 				var doc = frappe.model.get_new_doc('Stock Entry');
 				if (entry_type) doc.stock_entry_type = entry_type;
@@ -52,6 +53,8 @@ erpnext.stock.ItemDashboard = Class.extend({
 				var row = frappe.model.add_child(doc, 'items');
 				row.item_code = item;
 				row.s_warehouse = warehouse;
+				row.uom = uom;
+				row.conversion_factor = 1;
 
 				frappe.set_route('Form', doc.doctype, doc.name);
 			})

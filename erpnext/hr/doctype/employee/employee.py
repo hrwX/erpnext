@@ -40,6 +40,9 @@ class Employee(NestedSet):
 		from erpnext.controllers.status_updater import validate_status
 		validate_status(self.status, ["Active", "Temporary Leave", "Left"])
 
+		if frappe.flags.in_test:
+			self.last_name = frappe.generate_hash()
+
 		self.employee = self.name
 		self.set_employee_name()
 		self.validate_date()

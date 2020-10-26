@@ -63,9 +63,9 @@ frappe.listview_settings['Purchase Invoice'] = {
 								doc: {}
 							});
 						}
-					})
+					});
 				}
-			})
+			});
 		};
 
 		listview.page.add_actions_menu_item(__('Email'), action, true);

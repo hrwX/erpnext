@@ -59,9 +59,9 @@ frappe.listview_settings['Sales Invoice'] = {
 								doc: {}
 							});
 						}
-					})
+					});
 				}
-			})
+			});
 		};
 
 		listview.page.add_actions_menu_item(__('Email'), action, true);

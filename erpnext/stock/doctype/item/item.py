@@ -18,7 +18,7 @@ from frappe.website.doctype.website_slideshow.website_slideshow import get_slide
 from frappe.website.render import clear_cache
 from frappe.website.website_generator import WebsiteGenerator
 
-from six import iteritems, string_types
+from six import iteritems
 from erpnext import get_default_company
 from erpnext.accounts.utils import get_company_default
 from frappe.utils import cstr

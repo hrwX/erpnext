@@ -66,7 +66,7 @@ frappe.listview_settings['Purchase Order'] = {
 					}
 				});
 			}
-		}
+		};
 
 		listview.page.add_actions_menu_item(__('Email'), action, true);
 	}

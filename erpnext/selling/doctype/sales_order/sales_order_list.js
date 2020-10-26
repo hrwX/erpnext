@@ -64,7 +64,7 @@ frappe.listview_settings['Sales Order'] = {
 				if (doc.title !== title) {
 					frappe.throw(__("Select only one customer's sales orders"));
 				}
-			};
+			}
 
 			frappe.call({
 				method: "erpnext.utilities.utils.get_contact",
@@ -116,8 +116,7 @@ function get_action(listview, dt, method) {
 			}
 		};
 
-		frappe.confirm(__(`This will create a {0} for each Sales Order.<br><br>
-			Are you sure you want to create {1} {2}(s) ?`, [dt, selected_docs.length, dt]),
+		frappe.confirm(__(`This will create a {0} for each Sales Order.<br><br>Are you sure you want to create {1} {2}(s) ?`, [dt, selected_docs.length, dt]),
 			() => {
 				frappe.call({
 					method: method,
@@ -141,7 +140,7 @@ function get_action(listview, dt, method) {
 								.join(", ");
 
 							created_order_message += ```<li>
-								<strong>${order.customer}</strong> (${order.sales_order}): ${order_details}
+								<strong>${order_details.customer}</strong> (${order_details.sales_order}): ${order_details}
 							</li>```;
 						}
 
@@ -159,7 +158,7 @@ function get_action(listview, dt, method) {
 								.join(", ");
 
 							existing_order_message += ```<li>
-								<strong>${order.customer}</strong> (${order.sales_order}): ${details || "No available items to pick"}
+								<strong>${existing_order.customer}</strong> (${existing_order.sales_order}): ${details || "No available items to pick"}
 							</li>```;
 						}
 
@@ -184,4 +183,4 @@ function get_action(listview, dt, method) {
 				});
 			});
 	}
-}
+};

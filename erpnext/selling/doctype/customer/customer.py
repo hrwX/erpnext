@@ -75,7 +75,9 @@ class Customer(TransactionBase):
 				frappe.throw(_("Total contribution percentage should be equal to 100"))
 
 	def update_lead_acc_open_date(self):
-		"""update lead account opend date"""
+		"""
+			update lead account opend date
+		"""
 		if self.lead_name and self.opening_date:
 			frappe.db.set_value("Lead", self.lead_name, "account_opened_date", self.opening_date)
 

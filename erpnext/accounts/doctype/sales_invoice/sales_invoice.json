@@ -168,6 +168,8 @@
   "c_form_no",
   "column_break8",
   "remarks",
+  "signature_section_section",
+  "signature",
   "sales_team_section_break",
   "sales_partner",
   "column_break10",
@@ -1572,12 +1574,25 @@
    "fieldtype": "Select",
    "label": "Order Type",
    "options": "\nSales\nMaintenance\nShopping Cart\nPromotional\nSample\nPAD\nWarranty\nConsignment\nReplenishment\nMarketing"
+  },
+  {
+   "allow_on_submit": 1,
+   "collapsible": 1,
+   "fieldname": "signature_section_section",
+   "fieldtype": "Section Break",
+   "label": "Signature Section"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "signature",
+   "fieldtype": "Signature",
+   "label": "Signature"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 181,
  "is_submittable": 1,
- "modified": "2020-09-24 06:18:55.305060",
+ "modified": "2020-10-22 23:37:43.968637",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Sales Invoice",

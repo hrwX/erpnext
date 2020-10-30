@@ -1,5 +1,4 @@
 {
- "actions": [],
  "creation": "2013-06-24 16:37:54",
  "description": "Settings",
  "doctype": "DocType",
@@ -19,6 +18,7 @@
   "section_break_7",
   "auto_insert_price_list_rate_if_missing",
   "allow_negative_stock",
+  "autoname_item",
   "column_break_10",
   "automatically_set_serial_nos_based_on_fifo",
   "automatically_set_batch_nos_based_on_fifo",
@@ -197,13 +197,18 @@
    "fieldname": "automatically_set_batch_nos_based_on_fifo",
    "fieldtype": "Check",
    "label": "Automatically Set Batch Nos based on FIFO"
+  },
+  {
+   "default": "0",
+   "fieldname": "autoname_item",
+   "fieldtype": "Check",
+   "label": "Suggest Item Code"
   }
  ],
  "icon": "icon-cog",
  "idx": 1,
  "issingle": 1,
- "links": [],
- "modified": "2019-12-25 22:56:33.206204",
+ "modified": "2020-10-22 05:08:55.770976",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Stock Settings",

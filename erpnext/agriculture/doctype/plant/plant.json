@@ -1,5 +1,5 @@
 {
- "autoname": "field:plant_tag",
+ "autoname": "field:title",
  "creation": "2020-07-18 06:47:59.662640",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -174,7 +174,7 @@
    "reqd": 1
   }
  ],
- "modified": "2020-09-28 16:15:39.506193",
+ "modified": "2020-10-22 03:17:36.293743",
  "modified_by": "Administrator",
  "module": "Agriculture",
  "name": "Plant",
@@ -206,6 +206,5 @@
  "restrict_to_domain": "Agriculture",
  "sort_field": "modified",
  "sort_order": "DESC",
- "title_field": "plant_tag",
  "track_changes": 1
 }

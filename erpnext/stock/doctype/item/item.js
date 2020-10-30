@@ -7,8 +7,9 @@ frappe.ui.form.on("Item", {
 	setup: function(frm) {
 		frm.make_methods = {
 			'Purchase Order': () => {
-				frappe.new_doc("Purchase Order", {
-					supplier: frm.doc.item_defaults ? frm.doc.item_defaults[0].default_supplier : null
+				frappe.model.open_mapped_doc({
+					method: 'erpnext.stock.doctype.item.item.make_purchase_order_item',
+					frm: frm
 				})
 			}
 		}
@@ -129,6 +130,7 @@ frappe.ui.form.on("Item", {
 		});
 
 		frm.toggle_reqd('customer', frm.doc.is_customer_provided_item ? 1 : 0);
+		frm.toggle_reqd('item_code', true);
 	},
 
 	validate: function(frm){

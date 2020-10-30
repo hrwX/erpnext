@@ -8,6 +8,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils.html_utils import clean_html
+from frappe.custom.doctype.property_setter.property_setter import make_property_setter
 
 class StockSettings(Document):
 	def validate(self):
@@ -33,6 +34,9 @@ class StockSettings(Document):
 		self.validate_warehouses()
 		self.cant_change_valuation_method()
 		self.validate_clean_description_html()
+
+	def on_update(self):
+		toggle_item_code_reqd(self)
 
 	def validate_warehouses(self):
 		warehouse_fields = ["default_warehouse", "sample_retention_warehouse"]
@@ -61,10 +65,15 @@ class StockSettings(Document):
 			# changed to text
 			frappe.enqueue('erpnext.stock.doctype.stock_settings.stock_settings.clean_all_descriptions', now=frappe.flags.in_test)
 
-
 def clean_all_descriptions():
 	for item in frappe.get_all('Item', ['name', 'description']):
 		if item.description:
 			clean_description = clean_html(item.description)
 		if item.description != clean_description:
 			frappe.db.set_value('Item', item.name, 'description', clean_description)
+
+def toggle_item_code_reqd(settings):
+	if settings.autoname_item:
+		make_property_setter("Item", "item_code", "reqd", 1, "Check")
+	else:
+		frappe.delete_doc_if_exists("Property Setter", "Item-item_code-reqd")

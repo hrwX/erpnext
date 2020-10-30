@@ -241,17 +241,17 @@ class TestSubscription(unittest.TestCase):
 		subscription.insert()
 		subscription.process()		# generate first invoice
 
-		self.assertEqual(subscription.status, 'Past Due Date')
+		self.assertEqual(subscription.status, 'Unpaid')
 
 		subscription.process()
 		# Grace period is 1000 days so status should remain as Past Due Date
-		self.assertEqual(subscription.status, 'Past Due Date')
+		self.assertEqual(subscription.status, 'Unpaid')
 
 		subscription.process()
-		self.assertEqual(subscription.status, 'Past Due Date')
+		self.assertEqual(subscription.status, 'Unpaid')
 
 		subscription.process()
-		self.assertEqual(subscription.status, 'Past Due Date')
+		self.assertEqual(subscription.status, 'Unpaid')
 
 		settings.grace_period = grace_period
 		settings.save()

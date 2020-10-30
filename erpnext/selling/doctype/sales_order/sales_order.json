@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "autoname": "naming_series:",
  "creation": "2013-06-18 12:39:59",
@@ -129,6 +128,8 @@
   "column_break_81",
   "per_billed",
   "billing_status",
+  "signature_section_section",
+  "signature",
   "sales_team_section_break",
   "sales_partner",
   "column_break7",
@@ -141,7 +142,8 @@
   "to_date",
   "column_break_108",
   "auto_repeat",
-  "update_auto_repeat_reference"
+  "update_auto_repeat_reference",
+  "is_completed"
  ],
  "fields": [
   {
@@ -1225,13 +1227,25 @@
    "fieldname": "delivery_end_time",
    "fieldtype": "Time",
    "label": "Delivery End time"
+  },
+  {
+   "allow_on_submit": 1,
+   "collapsible": 1,
+   "fieldname": "signature_section_section",
+   "fieldtype": "Section Break",
+   "label": "Signature Section"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "signature",
+   "fieldtype": "Signature",
+   "label": "Signature"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "links": [],
- "modified": "2020-07-16 01:47:12.785055",
+ "modified": "2020-10-22 23:39:00.699855",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Sales Order",

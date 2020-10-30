@@ -69,19 +69,20 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 			};
 		};
 
-		if (frappe.user.has_role('System Manager')) {
-			this.menu_items.push({
-				label: __('Project Settings'),
-				action: () => this.show_list_settings("Project", this.listview_settings),
-				standard: true
-			});
+		// Should be uncommented after List View Settings are ported
+		// if (frappe.user.has_role('System Manager')) {
+		// 	this.menu_items.push({
+		// 		label: __('Project Settings'),
+		// 		action: () => this.show_list_settings("Project", this.listview_settings),
+		// 		standard: true
+		// 	});
 
-			this.menu_items.push({
-				label: __('Task Settings'),
-				action: () => this.show_list_settings("Task", this.task_listview_settings),
-				standard: true
-			});
-		}
+		// 	this.menu_items.push({
+		// 		label: __('Task Settings'),
+		// 		action: () => this.show_list_settings("Task", this.task_listview_settings),
+		// 		standard: true
+		// 	});
+		// }
 
 		// bulk delete
 		if (frappe.model.can_delete(doctype)) {
@@ -340,7 +341,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 
 	get_call_args(filters) {
 		return {
-			method: "erpnext.projects.page.project_tree.project_tree.get_projects_data",
+			method: "erpnext.projects.page.project_tree.project.get_projects_data",
 			args: {
 				params: {
 					doctype: "Project",
@@ -372,13 +373,13 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 	setup_side_bar() {}
 
 	get_settings(doctype, attr) {
-		// return frappe.call({
-		// 	method: "frappe.desk.listview.get_list_settings",
-		// 	args: {
-		// 		doctype: doctype
-		// 	},
-		// 	async: false
-		// }).then(doc => this[attr] = doc.message || {});
+		return frappe.call({
+			method: "frappe.desk.listview.get_list_settings",
+			args: {
+				doctype: doctype
+			},
+			async: false
+		}).then(doc => this[attr] = doc.message || {});
 	}
 
 	setup_events() {
@@ -504,7 +505,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 			// render
 			this.render_header(this.task_columns, true);
 			this.prepare_data(r);
-
+			this.convert_to_user_tztoggle_result_area()
 			this.render("Task", true, project);
 			this.render_previous_button();
 		});
@@ -515,7 +516,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 			let task_list = this.$result.find(".octicon-chevron-right").parent();
 			this.toggle_expand_collapse_button('expand');
 
-			if (!task_list) return
+			if (!task_list) return;
 			task_list.map((i, task) => {
 				let task_name = task.getAttribute("data-name");
 				if (task_name) {
@@ -532,7 +533,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 
 			if (!task_list) return
 			task_list.map((i, task) => {
-				let task_name = task.getAttribute("data-name")
+				let task_name = task.getAttribute("data-name");
 				let $row = this.$result.find(`.list-rows[data-name="${task_name}"]`);
 				let list = $row.find(`.nested-list-row-container`);
 				let $list = $(list);
@@ -832,7 +833,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 		return `<span class="filterable"
 				data-filter="_assign,like,%${last_assignee}%">
 				${frappe.avatar(last_assignee)}
-			</span>`
+			</span>`;
 	}
 
 	get_meta_html(doc, create_new) {

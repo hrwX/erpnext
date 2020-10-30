@@ -4,12 +4,12 @@
  "docstatus": 0,
  "doctype": "Page",
  "idx": 0,
- "modified": "2020-10-23 01:28:33.610727",
+ "modified": "2020-10-30 00:49:12.432691",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "project-tree",
  "owner": "Administrator",
- "page_name": "Project Tree",
+ "page_name": "project-tree",
  "roles": [
   {
    "role": "Administrator"
@@ -27,5 +27,6 @@
  "script": null,
  "standard": "Yes",
  "style": null,
- "system_page": 0
+ "system_page": 0,
+ "title": "Project Tree"
 }

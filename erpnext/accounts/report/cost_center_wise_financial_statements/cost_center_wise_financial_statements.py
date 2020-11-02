@@ -4,7 +4,6 @@
 from __future__ import unicode_literals
 import frappe, erpnext
 from frappe import _
-from frappe.utils import flt, cint, getdate
 from erpnext.accounts.report.financial_statements import get_cost_centers_with_children
 from erpnext.accounts.report.consolidated_financial_statement.consolidated_financial_statement import get_balance_sheet_data, get_profit_loss_data
 

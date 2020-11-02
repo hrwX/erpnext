@@ -19,4 +19,22 @@ frappe.ui.form.on('Harvest', {
 			frappe.set_route("Form", 'Stock Entry', stock_entry.name);
 		});
 	},
+	calculate_total_harvest_weight: (frm) => {
+		let total_weight = 0;
+		if (frm.doc.plants) {
+			frm.doc.plants.forEach(plant => {
+				total_weight += plant.harvest_weight;
+			});
+		}
+		frm.set_value("total_harvest_weight", total_weight);
+	},
+});
+frappe.ui.form.on('Harvest Plant', {
+	harvest_weight: function (frm) {
+		frm.trigger("calculate_total_harvest_weight");
+	},
+
+	plants_remove: function (frm) {
+		frm.trigger("calculate_total_harvest_weight");
+	}
 });

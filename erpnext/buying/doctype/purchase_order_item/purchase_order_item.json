@@ -166,7 +166,6 @@
    "oldfieldname": "description",
    "oldfieldtype": "Small Text",
    "print_width": "300px",
-   "reqd": 1,
    "width": "300px"
   },
   {
@@ -762,7 +761,7 @@
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2020-09-21 01:37:36.394849",
+ "modified": "2020-10-30 01:54:35.789038",
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Purchase Order Item",

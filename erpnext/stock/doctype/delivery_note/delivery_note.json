@@ -1101,7 +1101,7 @@
    "no_copy": 1,
    "oldfieldname": "status",
    "oldfieldtype": "Select",
-   "options": "\nDraft\nTo Bill\nTo Deliver\nOut for Delivery\nDelivered\nCompleted\nCancelled\nClosed",
+   "options": "\nDraft\nTo Bill\nTo Deliver\nIn Transit\nDelivered\nCompleted\nCancelled\nClosed",
    "print_hide": 1,
    "print_width": "150px",
    "read_only": 1,

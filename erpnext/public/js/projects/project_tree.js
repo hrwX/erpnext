@@ -505,7 +505,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 			// render
 			this.render_header(this.task_columns, true);
 			this.prepare_data(r);
-			this.convert_to_user_tztoggle_result_area()
+			this.toggle_result_area();
 			this.render("Task", true, project);
 			this.render_previous_button();
 		});
@@ -531,7 +531,8 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 			let task_list = this.$result.find(".octicon-chevron-down").parent();
 			this.toggle_expand_collapse_button('collapse');
 
-			if (!task_list) return
+			if (!task_list) return;
+
 			task_list.map((i, task) => {
 				let task_name = task.getAttribute("data-name");
 				let $row = this.$result.find(`.list-rows[data-name="${task_name}"]`);

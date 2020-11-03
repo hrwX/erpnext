@@ -439,7 +439,7 @@ class TestDeliveryNote(unittest.TestCase):
 		so = make_sales_order()
 		dn = create_dn_against_so(so.name, delivered_qty=2)
 
-		self.assertEqual(dn.status, "To Bill")
+		self.assertEqual(dn.status, "To Deliver")
 		self.assertEqual(dn.per_billed, 0)
 
 		si = make_sales_invoice(dn.name)
@@ -471,7 +471,7 @@ class TestDeliveryNote(unittest.TestCase):
 
 		self.assertEqual(dn1.get("items")[0].billed_amt, 200)
 		self.assertEqual(dn1.per_billed, 100)
-		self.assertEqual(dn1.status, "Completed")
+		self.assertEqual(dn1.status, "To Deliver")
 
 		dn2 = make_delivery_note(so.name)
 		dn2.set_posting_time = 1
@@ -486,7 +486,7 @@ class TestDeliveryNote(unittest.TestCase):
 
 		self.assertEqual(dn2.get("items")[0].billed_amt, 400)
 		self.assertEqual(dn2.per_billed, 100)
-		self.assertEqual(dn2.status, "Completed")
+		self.assertEqual(dn2.status, "To Deliver")
 
 	def test_dn_billing_status_case3(self):
 		# SO -> DN1 -> SI and SO -> SI and SO -> DN2
@@ -524,7 +524,7 @@ class TestDeliveryNote(unittest.TestCase):
 
 		self.assertEqual(dn2.get("items")[0].billed_amt, 400)
 		self.assertEqual(dn2.per_billed, 80)
-		self.assertEqual(dn2.status, "To Bill")
+		self.assertEqual(dn2.status, "To Deliver")
 
 	def test_dn_billing_status_case4(self):
 		# SO -> SI -> DN
@@ -541,7 +541,7 @@ class TestDeliveryNote(unittest.TestCase):
 
 		self.assertEqual(dn.get("items")[0].billed_amt, 1000)
 		self.assertEqual(dn.per_billed, 100)
-		self.assertEqual(dn.status, "Completed")
+		self.assertEqual(dn.status, "To Deliver")
 
 	def test_delivery_trip(self):
 		dn = create_delivery_note()

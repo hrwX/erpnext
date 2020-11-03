@@ -227,6 +227,8 @@ class DeliveryNote(SellingController):
 		if self.issue_credit_note:
 			self.close_sales_orders()
 
+		if not self.delivered: self.status = "To Deliver"
+
 	def on_update_after_submit(self):
 		self.status = "Delivered" if self.delivered else "To Deliver"
 		if self.delivered and frappe.db.get_single_value("Accounts Settings", "auto_create_invoice_on_delivery_note") == "Delivered":
@@ -310,6 +312,9 @@ class DeliveryNote(SellingController):
 				invoice.submit()
 
 				new_invoices.append(get_link_to_form("Sales Invoice", invoice.name))
+
+				for item in self.items:
+  					item.against_sales_invoice = invoice.name
 
 		if new_invoices:
 			new_invoices = ", ".join(str(invoice) for invoice in new_invoices)

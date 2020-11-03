@@ -31,6 +31,9 @@ class DeliveryTrip(Document):
 	def on_submit(self):
 		self.update_delivery_notes()
 
+	def on_update_after_submit(self):
+		self.update_delivery_note_status()
+		self.validate_payment_due_date()
 	def before_submit(self):
 		self.update_status()
 
@@ -50,6 +53,25 @@ class DeliveryTrip(Document):
 		for stop in self.delivery_stops:
 			if not stop.customer_address:
 				stop.customer_address = get_address_display(frappe.get_doc("Address", stop.address).as_dict())
+
+	def validate_payment_due_date(self):
+		for stop in self.delivery_stops:
+			if stop.visited and stop.sales_invoice and stop.paid_amount != stop.grand_total:
+				update_payment_due_date(stop.sales_invoice)
+
+	def update_delivery_note_status(self):
+		for stop in self.delivery_stops:
+			if stop.delivery_note and stop.visited:
+				status = frappe.db.get_value("Sales Invoice", stop.sales_invoice, "status")
+				if status == "Unpaid":
+					frappe.db.set_value("Delivery Note", stop.delivery_note, "status", "Delivered")
+				if status == "Paid":
+					frappe.db.set_value("Delivery Note", stop.delivery_note, "status", "Completed")
+			else:
+				if self.status == "In Transit":
+					frappe.db.set_value("Delivery Note", stop.delivery_note, "status", "In Transit")
+				else:
+					frappe.db.set_value("Delivery Note", stop.delivery_note, "status", "To Deliver")
 
 	def update_status(self):
 		status = {
@@ -254,6 +276,18 @@ class DeliveryTrip(Document):
 			frappe.throw(_(str(e)))
 
 		return directions[0] if directions else False
+
+
+def update_payment_due_date(sales_invoice):
+	invoice = frappe.get_doc("Sales Invoice", sales_invoice)
+	if not invoice.payment_terms_template:
+		return
+	due_date = get_due_date(invoice.posting_date, "Customer", invoice.customer, bill_date=frappe.utils.add_days(nowdate(), 7))
+	# Update due date in both parent and child documents
+	invoice.due_date = due_date
+	for term in invoice.payment_schedule:
+		term.due_date = due_date
+	invoice.save()
 
 
 @frappe.whitelist()
@@ -532,7 +566,7 @@ def create_or_update_timesheet(trip, action, odometer_value=None):
 				timesheet.save()
 				timesheet.submit()
 
-		
+
 		delivery_trip.status = "Completed"
 		delivery_trip.odometer_end_value = odometer_value
 		delivery_trip.odometer_end_time = time
@@ -585,8 +619,7 @@ def update_delivery_trip_status(payment_amount, sales_invoice):
 		trip_doc = frappe.get_doc("Delivery Trip", trip)
 		for stop in trip_doc.delivery_stops:
 			if stop.name in delivery_stops:
-				stop.visited = True
-				stop.paid_amount = payment_amount
+				frappe.db.set_value("Delivery Stop", stop.name, "paid_amount", payment_amount)
+				frappe.db.set_value("Delivery Stop", stop.name, "visited", 1)
 				if stop.delivery_note:
 					frappe.db.set_value("Delivery Note", stop.delivery_note, "status", "Completed")
-		trip_doc.save()

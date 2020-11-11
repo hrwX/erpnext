@@ -637,8 +637,14 @@ erpnext.work_order = {
 		} else {
 			if (purpose === 'Manufacture') {
 				max = flt(frm.doc.material_transferred_for_manufacturing) - flt(frm.doc.produced_qty);
+				if (frm.doc.manufacturing_type === "Process") {
+					max = max * (frm.doc.raw_material_qty / frm.doc.qty);
+				}
 			} else {
 				max = flt(frm.doc.qty) - flt(frm.doc.material_transferred_for_manufacturing);
+				if (frm.doc.manufacturing_type === "Process") {
+					max = max * (frm.doc.raw_material_qty / frm.doc.qty);
+				}
 			}
 		}
 		return flt(max, precision('qty'));
@@ -646,15 +652,26 @@ erpnext.work_order = {
 
 	show_prompt_for_qty_input: function(frm, purpose) {
 		let max = this.get_max_transferable_qty(frm, purpose);
+		let label = __('Qty for {0}', [purpose]);
+
+		if (frm.doc.manufacturing_type === "Process" && purpose === "Manufacture") {
+			label = __('Raw Material Consumed for {0}', [purpose]);
+		}
+		else if (frm.doc.manufacturing_type === "Process") {
+			label = __('Raw Material Qty for {0}', [purpose]);
+		}
+
 		return new Promise((resolve, reject) => {
 			frappe.prompt({
 				fieldtype: 'Float',
-				label: __('Qty for {0}', [purpose]),
+				label: label,
 				fieldname: 'qty',
 				description: __('Max: {0}', [max]),
 				default: max
 			}, data => {
-				max += (max * (frm.doc.__onload.overproduction_percentage || 0.0)) / 100;
+				if (frm.doc.manufacturing_type != "Process") {
+					max += (max * (frm.doc.__onload.overproduction_percentage || 0.0)) / 100;
+				}
 
 				if (data.qty > max) {
 					frappe.msgprint(__('Quantity must not be more than {0}', [max]));
@@ -669,10 +686,14 @@ erpnext.work_order = {
 	make_se: function(frm, purpose) {
 		this.show_prompt_for_qty_input(frm, purpose)
 			.then(data => {
+				let qty = data.qty;
+				if (frm.doc.manufacturing_type === "Process") {
+					qty = (frm.doc.qty / frm.doc.raw_material_qty) * data.qty;
+				}
 				return frappe.xcall('erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry', {
 					'work_order_id': frm.doc.name,
 					'purpose': purpose,
-					'qty': data.qty
+					'qty': qty
 				});
 			}).then(stock_entry => {
 				frappe.model.sync(stock_entry);

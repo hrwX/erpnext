@@ -10,6 +10,7 @@
   "strain",
   "column_break_3",
   "growth_phase",
+  "growth_date",
   "strain_id",
   "plant_batch_id",
   "section_break_3",
@@ -252,9 +253,14 @@
    "fieldtype": "Link",
    "label": "Plant Tag",
    "options": "Plant Tag"
+  },
+  {
+   "fieldname": "growth_date",
+   "fieldtype": "Date",
+   "label": "Growth Date"
   }
  ],
- "modified": "2020-09-16 03:35:21.336302",
+ "modified": "2020-10-31 07:15:25.941787",
  "modified_by": "Administrator",
  "module": "Agriculture",
  "name": "Plant Batch",

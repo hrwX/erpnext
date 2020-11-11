@@ -754,5 +754,54 @@ erpnext.taxes_and_totals = erpnext.payments.extend({
 				}
 			});
 		})
+	},
+	set_and_update_cultivation_tax: function () {
+		const me = this;
+		if (["Quotation", "Sales Invoice", "Delivery Note", "Sales Order"].includes(me.frm.doctype) && !me.frm.doc.license) {
+			return;
+		}
+
+		frappe.db.get_value("Compliance Info", { "name": me.frm.doc.license }, "license_for", (r) => {
+			if (["Sales Order", "Sales Invoice", "Delivery Note", "Stock Entry"].includes(me.frm.doctype) && (!r || r.license_for !== "Distributor")) {
+				return;
+			}
+		});
+
+		let tax_account_list = [];
+		// get tax account head from company master to avoid disorder behaviour and remove it from taxes table.
+		frappe.db.get_value('Company', { "name": me.frm.doc.company }, ["default_cultivation_tax_account_flower", "default_cultivation_tax_account_leaf", "default_cultivation_tax_account_plant"], (r) => {
+			let taxes = me.frm.doc.taxes;
+			tax_account_list = [r.default_cultivation_tax_account_flower, r.default_cultivation_tax_account_leaf, r.default_cultivation_tax_account_plant];
+			if (taxes && taxes.length > 0) {
+				$.each(taxes, function (i, tax) {
+					if (tax_account_list.indexOf(tax.account_head) !== -1) {
+						me.frm.get_field("taxes").grid.grid_rows[i].remove();
+					}
+				});
+			}
+		});
+
+		frappe.call({
+			method: "erpnext.compliance.taxes.set_cultivation_tax",
+			args: {
+				doc: me.frm.doc
+			},
+			callback: (r) => {
+				if (r.message) {
+					let taxes = me.frm.doc.taxes;
+					let cultivation_tax_row_list = r.message;
+					for (let cultivation_tax_row of cultivation_tax_row_list) {
+						if (cultivation_tax_row.tax_amount > 0) {
+							me.frm.add_child('taxes', cultivation_tax_row);
+							me.frm.refresh_field('taxes');
+							me.calculate_taxes_and_totals();
+						}
+					}
+					if (me.frm.doc.items.length === 0 && (taxes && taxes.length > 0)) {
+						me.frm.get_field("taxes").grid.remove_all();
+					}
+				}
+			}
+		});
 	}
 });

@@ -66,6 +66,10 @@ def set_default_settings(args):
 	hr_settings.birthday_email_template = _("Birthday Email Notification")
 	hr_settings.save()
 
+	accounts_settings = frappe.get_doc("Accounts Settings")
+	accounts_settings.statement_of_account_email_template = "Statement of Account"
+	accounts_settings.save()
+
 def set_no_copy_fields_in_variant_settings():
 	# set no copy fields of an item doctype to item variant settings
 	doc = frappe.get_doc('Item Variant Settings')

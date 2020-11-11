@@ -15,6 +15,9 @@ MARKUP_PERCENTAGE = 80
 
 
 def calculate_cannabis_tax(doc):
+	if frappe.get_cached_value("Stock Settings", None, "disable_cannabis_taxes_calculation"):
+		return
+
 	compliance_items = frappe.get_all('Item',
 		filters={'is_compliance_item': True},
 		fields=['item_code', 'enable_cultivation_tax', 'item_category'])
@@ -120,7 +123,7 @@ def get_cultivation_tax_row(cultivation_tax_account, cultivation_tax_amount):
 		'category': 'Total',
 		'charge_type': 'Actual',
 		'add_deduct_tax': 'Deduct',
-		'description': 'Cultivation Tax',
+		'description': cultivation_tax_account,
 		'account_head': cultivation_tax_account,
 		'tax_amount': cultivation_tax_amount
 	}
@@ -175,6 +178,9 @@ def set_taxes(doc, tax_row):
 	if not tax_row:
 		return
 
+	if not tax_row.get("tax_amount"):
+		return
+
 	existing_tax_row = doc.get("taxes", filters={"account_head": tax_row.get('account_head')})
 
 	# update an existing tax row, or create a new one
@@ -198,6 +204,9 @@ def convert_to_ounces(uom, qty):
 
 @frappe.whitelist()
 def set_excise_tax(doc):
+	if frappe.get_cached_value("Stock Settings", None, "disable_cannabis_taxes_calculation"):
+		return
+
 	if isinstance(doc, str):
 		doc = frappe._dict(json.loads(doc))
 
@@ -208,9 +217,25 @@ def set_excise_tax(doc):
 	excise_tax_row = calculate_excise_tax(doc, compliance_items)
 	return excise_tax_row
 
+@frappe.whitelist()
+def set_cultivation_tax(doc):
+	if isinstance(doc, str):
+		doc = frappe._dict(json.loads(doc))
+
+	compliance_items = frappe.get_all('Item', filters={'is_compliance_item': True}, fields=['item_code'])
+	if not compliance_items:
+		return
+	cultivation_tax_row = []
+	cultivation_taxes = calculate_cultivation_tax(doc)
+	for account, tax in cultivation_taxes.items():
+		cultivation_tax_row.append(get_cultivation_tax_row(account, tax))
+	return cultivation_tax_row
 
 @frappe.whitelist()
 def get_cultivation_tax(doc, items):
+	if frappe.get_cached_value("Stock Settings", None, "disable_cannabis_taxes_calculation"):
+		return
+
 	if isinstance(doc, str):
 		doc = frappe._dict(json.loads(doc))
 

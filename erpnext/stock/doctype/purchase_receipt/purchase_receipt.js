@@ -26,7 +26,8 @@ frappe.ui.form.on("Purchase Receipt", {
 		frm.custom_make_buttons = {
 			'Quality Inspection': 'Quality Inspection',
 			'Stock Entry': 'Return',
-			'Purchase Invoice': 'Purchase Invoice'
+			'Purchase Invoice': 'Purchase Invoice',
+			'Production Plan': 'Production Plan',
 		};
 
 		frm.set_query("expense_account", "items", function() {
@@ -57,6 +58,13 @@ frappe.ui.form.on("Purchase Receipt", {
 			}, __('Create'));
 			frm.page.set_inner_btn_group_as_primary(__('Create'));
 		}
+
+		frm.add_custom_button(__('Production Plan'), function() {
+			frappe.model.open_mapped_doc({
+				method: "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_production_plan",
+				frm: frm,
+			})
+		}, __('Create'));
 	},
 
 	company: function(frm) {

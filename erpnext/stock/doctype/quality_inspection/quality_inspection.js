@@ -8,7 +8,7 @@ frappe.ui.form.on("Quality Inspection", {
 		frm.set_query("batch_no", function (doc) {
 			return {
 				filters: {
-					'item_code': doc.item_code
+					'item': doc.item_code
 				}
 			}
 		});

@@ -12,11 +12,8 @@
   "cb_metrc",
   "metrc_vendor_key",
   "metrc_user_key",
-  "sb_sync",
-  "metrc_push_data",
-  "metrc_pull_data",
-  "column_break_12",
-  "pull_incoming_transfer"
+  "section_break_9",
+  "company"
  ],
  "fields": [
   {
@@ -64,35 +61,19 @@
    "label": "User Key"
   },
   {
-   "depends_on": "eval:doc.is_compliance_enabled",
-   "fieldname": "sb_sync",
+   "fieldname": "section_break_9",
    "fieldtype": "Section Break"
   },
   {
-   "default": "0",
-   "fieldname": "metrc_push_data",
-   "fieldtype": "Check",
-   "label": "Push Data"
-  },
-  {
-   "default": "0",
-   "fieldname": "metrc_pull_data",
-   "fieldtype": "Check",
-   "label": "Pull Data"
-  },
-  {
-   "fieldname": "column_break_12",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "pull_incoming_transfer",
-   "fieldtype": "Check",
-   "label": "Pull Incoming Transfer"
+   "fieldname": "company",
+   "fieldtype": "Table",
+   "label": "Company",
+   "options": "Compliance Company",
+   "reqd": 1
   }
  ],
  "issingle": 1,
- "modified": "2020-09-18 16:19:41.043751",
+ "modified": "2020-11-22 22:35:11.900614",
  "modified_by": "Administrator",
  "module": "Compliance",
  "name": "Compliance Settings",

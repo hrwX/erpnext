@@ -1,0 +1,31 @@
+{
+ "add_total_row": 0,
+ "creation": "2020-10-22 08:45:45.261648",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "{}",
+ "modified": "2020-10-22 08:45:52.015594",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Average Days to Pay",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "GL Entry",
+ "report_name": "Average Days to Pay ",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Accounts User"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Auditor"
+  }
+ ]
+}

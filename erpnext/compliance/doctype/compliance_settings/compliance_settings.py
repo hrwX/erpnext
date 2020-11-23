@@ -19,3 +19,5 @@ class ComplianceSettings(Document):
 				companies.append(company.company)
 			else:
 				frappe.throw(_("Company {0} already added to sync.").format(frappe.bold(company.company)))
+
+		frappe.cache().hset("compliance", "companies", companies)

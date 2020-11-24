@@ -27,7 +27,11 @@ def clear_cart_count(login_manager):
 
 def update_website_context(context):
 	cart_enabled = is_cart_enabled()
-	context["shopping_cart_enabled"] = cart_enabled
+	context.update({
+		"shopping_cart_enabled": cart_enabled,
+		"shopping_cart_show_count": show_cart_count(),
+		"shopping_cart_count": frappe.local.cookie_manager.cookies.get("cart_count", 0) or 0
+	})
 
 def check_customer_or_supplier():
 	if frappe.session.user:

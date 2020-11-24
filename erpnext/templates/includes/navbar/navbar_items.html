@@ -1,10 +1,14 @@
 {% extends 'frappe/templates/includes/navbar/navbar_items.html' %}
 
 {% block navbar_right_extension %}
-	<li class="shopping-cart cart-icon hidden">
+	<li class="shopping-cart cart-icon {% if shopping_cart_count < 1 %}hidden{% endif %}">
 		<a href="/cart" class="nav-link">
 			{{ _("Cart") }}
-			<span class="badge badge-primary" id="cart-count"></span>
+			<span class="badge badge-primary" id="cart-count">
+				{%- if shopping_cart_show_count %}
+					{{ shopping_cart_count }}
+				{% endif -%}
+			</span>
 		</a>
 	 </li>
 {% endblock %}

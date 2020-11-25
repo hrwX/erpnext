@@ -15,6 +15,7 @@ from erpnext.hr.doctype.daily_work_summary.daily_work_summary import get_users_e
 from erpnext.hr.doctype.holiday_list.holiday_list import is_holiday
 from frappe.desk.form.assign_to import add
 from frappe.model.document import Document
+from frappe.desk.doctype.notification_log.notification_log import enqueue_create_notification
 
 class Project(Document):
 	def get_feed(self):
@@ -212,6 +213,30 @@ class Project(Document):
 				frappe.sendmail(user.user, subject=_("Project Collaboration Invitation"),
 								content=content.format(*messages))
 				user.welcome_email_sent = 1
+
+	def on_update(self):
+		self.notify()
+
+
+	def notify(self):
+		if not frappe.db.get_single_value("Projects Settings", "send_notifications_for_project"):
+			return
+
+		notification_doc = {
+			'type': 'Notify',
+			'document_type': self.doctype,
+			'subject': _("Project {0} has been updated.").format("<a href='{0}'>{1}</a>".format(self.get_url(), frappe.bold(self.name))),
+			'document_name': self.name,
+			'from_user': frappe.session.user
+		}
+
+		enqueue_create_notification(self.get_assigned_users(), notification_doc)
+
+		for user in self.get_assigned_users():
+			if user == frappe.session.user:
+				continue
+
+			frappe.publish_realtime('show_notification_alert', message=notification_doc.get("subject"), after_commit=True, user=user)
 
 def get_timeline_data(doctype, name):
 	'''Return timeline for attendance'''

@@ -11,6 +11,7 @@ from frappe.desk.form.assign_to import clear, close_all_assignments
 from frappe.model.mapper import get_mapped_doc
 from frappe.utils import add_days, cstr, date_diff, get_link_to_form, getdate, today
 from frappe.utils.nestedset import NestedSet
+from frappe.desk.doctype.notification_log.notification_log import enqueue_create_notification
 
 
 class CircularReferenceError(frappe.ValidationError): pass
@@ -110,6 +111,7 @@ class Task(NestedSet):
 		self.update_project()
 		self.unassign_todo()
 		self.populate_depends_on()
+		self.notify()
 
 	def unassign_todo(self):
 		if self.status == "Completed" and frappe.db.get_single_value("Projects Settings", "remove_assignment_on_task_completion"):
@@ -202,6 +204,26 @@ class Task(NestedSet):
 			if self.exp_end_date < datetime.now().date():
 				self.db_set('status', 'Overdue', update_modified=False)
 				self.update_project()
+
+	def notify(self):
+		if not frappe.db.get_single_value("Projects Settings", "send_notifications_for_task"):
+			return
+
+		notification_doc = {
+			'type': 'Notify',
+			'document_type': self.doctype,
+			'subject': _("Task {0} has been updated.").format("<a href='{0}'>{1}</a>".format(self.get_url(), frappe.bold(self.name))),
+			'document_name': self.name,
+			'from_user': frappe.session.user
+		}
+
+		enqueue_create_notification(self.get_assigned_users(), notification_doc)
+
+		for user in self.get_assigned_users():
+			if user == frappe.session.user:
+				continue
+
+			frappe.publish_realtime('show_notification_alert', message=notification_doc.get("subject"), after_commit=True, user=user)
 
 @frappe.whitelist()
 def check_if_child_exists(name):

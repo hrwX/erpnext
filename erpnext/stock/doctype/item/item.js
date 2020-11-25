@@ -7,10 +7,7 @@ frappe.ui.form.on("Item", {
 	setup: function(frm) {
 		frm.make_methods = {
 			'Purchase Order': () => {
-				frappe.model.open_mapped_doc({
-					method: 'erpnext.stock.doctype.item.item.make_purchase_order_item',
-					frm: frm
-				})
+				create_purchase_order(frm);
 			}
 		}
 		frm.add_fetch('attribute', 'numeric_values', 'numeric_values');
@@ -786,3 +783,142 @@ frappe.ui.form.on("UOM Conversion Detail", {
 		}
 	}
 })
+
+frappe.ui.form.on("Item Supplier", {
+	supplier: function(frm, cdt, cdn) {
+		let row = locals[cdt][cdn];
+		if (row.supplier) {
+			frappe.call({
+				method: "erpnext.stock.doctype.item.item.get_item_price",
+				args: {
+					supplier: row.supplier,
+					item_code: frm.doc.item_code
+				},
+				callback: function(r) {
+					if (!r.exc && r.message) {
+						frappe.model.set_value(cdt, cdn, "price_list", r.message.price_list);
+						frappe.model.set_value(cdt, cdn, "price_list_rate", r.message.price_list_rate);
+					}
+				}
+			});
+		}
+	}
+})
+
+function create_purchase_order(frm) {
+	let suppliers = [];
+
+	frm.doc.item_defaults.forEach(d => {
+		if (d.default_supplier) {
+			suppliers.push({
+				supplier: d.default_supplier,
+				price_list: d.default_price_list,
+				is_default: true
+			});
+		}
+	});
+
+	frm.doc.supplier_items.forEach(d => {
+		suppliers.push({
+			supplier: d.supplier,
+			price_list: d.price_list,
+			price_list_rate: d.price_list_rate,
+		});
+	});
+
+	let suppliers_html = ``;
+
+	suppliers.forEach(s => {
+		suppliers_html += `
+			<div class="grid-row">
+				<div class="data-row row">
+					<div class="col grid-static-col col-xs-4 " data-fieldname="supplier" data-fieldtype="Data">
+						<div class="field-area" style="display: none;"></div>
+						<div class="static-area ellipsis">${s.supplier}</div>
+					</div>
+					<div class="col grid-static-col col-xs-3 " data-fieldname="price_list" data-fieldtype="Select">
+						<div class="field-area" style="display: none;"></div>
+						<div class="static-area ellipsis">${s.price_list ? s.price_list : ``}</div>
+					</div>
+					<div class="col grid-static-col col-xs-2 " data-fieldname="price_list_rate" data-fieldtype="Select">
+						<div class="field-area" style="display: none;"></div>
+						<div class="static-area ellipsis">${s.price_list_rate ? s.price_list_rate : ``}</div>
+					</div>
+					<div class="col grid-static-col col-xs-2 " data-fieldname="default" data-fieldtype="Select">
+						<div class="field-area" style="display: none;"></div>
+						<div class="static-area ellipsis"></div>
+						${s.is_default ? `<span class="disp-area bold" style="display: inline;">
+								<i class="fa fa-check" style="margin-right: 3px;"></i>
+							</span>` : ``}
+					</div>
+					<div class="col grid-static-col col-xs-1 ">
+						<button class="btn btn-new btn-default btn-xs" data-supplier="${s.supplier}" data-price_list="${s.price_list ? s.price_list : ``}">
+							<i class="octicon octicon-plus" style="font-size: 12px;"></i>
+						</button>
+					</div>
+				</div>
+			</div>`;
+	});
+
+	let supplier_table = $(`<div class="frappe-control" data-fieldtype="Table" data-fieldname="suppliers" title="suppliers">
+			<div class="form-group" data-fieldname="suppliers">
+				<div class="clearfix">
+					<label class="control-label" style="padding-right: 0px;">Suppliers</label>
+				</div>
+				<div class="form-grid">
+				<div class="grid-heading-row">
+					<div class="grid-row">
+						<div class="data-row row">
+							<div class="col grid-static-col col-xs-4 " data-fieldname="supplier" data-fieldtype="Data">
+								<div class="field-area" style="display: none;"></div>
+								<div class="static-area ellipsis">Supplier</div>
+							</div>
+							<div class="col grid-static-col col-xs-3 " data-fieldname="price_list" data-fieldtype="Select">
+								<div class="field-area" style="display: none;"></div>
+								<div class="static-area ellipsis">Price List</div>
+							</div>
+							<div class="col grid-static-col col-xs-2 " data-fieldname="price_list_rate" data-fieldtype="Select">
+								<div class="field-area" style="display: none;"></div>
+								<div class="static-area ellipsis">Rate</div>
+							</div>
+							<div class="col grid-static-col col-xs-2 " data-fieldname="default" data-fieldtype="Select">
+								<div class="field-area" style="display: none;"></div>
+								<div class="static-area ellipsis">Default</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="grid-body">
+					<div class="rows">
+						${suppliers_html}
+					</div>
+				</div>
+			</div>
+		</div>`);
+
+	let create_new_button = supplier_table[0].getElementsByClassName('btn-new');
+
+	for (let i=0; i<create_new_button.length; i++) {
+		create_new_button[i].onclick = function() {
+			frappe.model.open_mapped_doc({
+				method: 'erpnext.stock.doctype.item.item.make_purchase_order_item',
+				frm: frm,
+				args: {
+					supplier: create_new_button[i].getAttribute("data-supplier"),
+					price_list: create_new_button[i].getAttribute("data-price_list")
+				}
+			});
+		}
+	}
+
+	let dialog = new frappe.ui.Dialog({
+		title: __("Create Purchase Order"),
+		fields: [
+			{
+				fieldtype: "HTML",
+				options: supplier_table
+			}
+		],
+	});
+	dialog.show();
+}

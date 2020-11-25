@@ -86,7 +86,6 @@
   "customer",
   "supplier_details",
   "delivered_by_supplier",
-  "column_break2",
   "supplier_items",
   "foreign_trade_details",
   "country_of_origin",
@@ -639,12 +638,6 @@
    "print_hide": 1
   },
   {
-   "fieldname": "column_break2",
-   "fieldtype": "Column Break",
-   "oldfieldtype": "Column Break",
-   "width": "50%"
-  },
-  {
    "fieldname": "supplier_items",
    "fieldtype": "Table",
    "label": "Supplier Items",
@@ -1115,7 +1108,7 @@
  "idx": 2,
  "image_field": "image",
  "max_attachments": 1,
- "modified": "2020-09-09 03:07:32.055534",
+ "modified": "2020-10-21 21:41:04.012082",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Item",

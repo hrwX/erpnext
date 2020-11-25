@@ -5,11 +5,12 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "title",
   "harvest_type",
   "status",
   "drying_location",
-  "drying_warehouse",
   "column_break_11",
+  "drying_warehouse",
   "total_harvest_weight",
   "harvest_uom",
   "is_finished",
@@ -85,17 +86,20 @@
    "label": "Is Finished"
   },
   {
- "is_submittable": 1,
- "modified": "2020-10-19 23:18:58.387487",
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
    "options": "\nActive\nHarvested\nDestroyed",
    "reqd": 1
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title"
   }
  ],
  "is_submittable": 1,
- "modified": "2020-10-26 00:28:20.863968",
+ "modified": "2020-11-01 21:38:28.555172",
  "modified_by": "Administrator",
  "module": "Agriculture",
  "name": "Harvest",
@@ -131,5 +135,6 @@
  "restrict_to_domain": "Agriculture",
  "sort_field": "modified",
  "sort_order": "DESC",
+ "title_field": "title",
  "track_changes": 1
 }

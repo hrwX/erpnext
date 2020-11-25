@@ -12,6 +12,7 @@ class TestMapper(unittest.TestCase):
 	def test_map_docs(self):
 		'''Test mapping of multiple source docs on a single target doc'''
 
+		make_test_records("Item Tax Template")
 		make_test_records("Item")
 		items = frappe.get_all("Item", fields = ["name", "item_code"], filters = {'is_sales_item': 1, 'has_variants': 0})
 		customers = frappe.get_all("Customer")

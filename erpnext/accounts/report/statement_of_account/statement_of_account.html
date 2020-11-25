@@ -77,9 +77,11 @@
 <div class="row flex-row">
 	<div class="col-xs-6 address">
 		<p class="company">
-			{{ report.addresses.company.name }}<br>
-			{{ report.addresses.company.address_line1 }}, {{ report.addresses.company.pincode }}<br>
-			{{ report.addresses.company.city }}, {{ report.addresses.company.state }}
+			{% if (report.addresses.company) { %}
+				{{ report.addresses.company.name }}<br>
+				{{ report.addresses.company.address_line1 }}, {{ report.addresses.company.pincode }}<br>
+				{{ report.addresses.company.city }}, {{ report.addresses.company.state }}
+			{% } %}
 		</p>
 	</div>
 	<div class="col-xs-6 statement-date ">
@@ -114,8 +116,10 @@
 	</p>
 
 	<p>
-		{{ report.addresses.party.address_line1 }},<br>
-		{{ report.addresses.party.city }}, {{ report.addresses.party.state }}
+		{% if (report.addresses.party)  { %}
+			{{ report.addresses.party.address_line1 }},<br>
+			{{ report.addresses.party.city }}, {{ report.addresses.party.state }}
+		{% } %}
 	</p>
 </div>
 

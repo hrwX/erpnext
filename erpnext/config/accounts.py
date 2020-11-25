@@ -398,6 +398,24 @@ def get_data():
 			]
 		},
 		{
+			"label": _("Loyalty Program"),
+			"icon": "fa fa-cog",
+			"items": [
+				{
+					"type": "doctype",
+					"name": "Loyalty Program",
+					"label": _("Loyalty Program"),
+					"description": _("To make Customer based incentive schemes.")
+				},
+				{
+					"type": "doctype",
+					"name": "Loyalty Point Entry",
+					"label": _("Loyalty Point Entry"),
+					"description": _("To view logs of Loyalty Points assigned to a Customer.")
+				}
+			]
+		},
+		{
 			"label": _("Settings"),
 			"icon": "fa fa-cog",
 			"items": [

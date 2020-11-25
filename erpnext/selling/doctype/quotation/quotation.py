@@ -148,6 +148,10 @@ def _make_sales_order(source_name, target_doc=None, ignore_permissions=False):
 	def update_item(obj, target, source_parent):
 		target.stock_qty = flt(obj.qty) * flt(obj.conversion_factor)
 
+	def update_payment_schedule(obj, target, source_parent):
+		if getdate(target.due_date) < getdate(nowdate()):
+			target.due_date = getdate(nowdate())
+
 	doclist = get_mapped_doc("Quotation", source_name, {
 			"Quotation": {
 				"doctype": "Sales Order",
@@ -172,7 +176,9 @@ def _make_sales_order(source_name, target_doc=None, ignore_permissions=False):
 			},
 			"Payment Schedule": {
 				"doctype": "Payment Schedule",
-				"add_if_empty": True
+				"add_if_empty": True,
+				"postprocess": update_payment_schedule
+
 			}
 		}, target_doc, set_missing_values, ignore_permissions=ignore_permissions)
 

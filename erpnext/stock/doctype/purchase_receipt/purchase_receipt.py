@@ -597,7 +597,6 @@ def update_billed_qty_based_on_po(po_detail, update_modified=True):
 
 @frappe.whitelist()
 def make_purchase_invoice(source_name, target_doc=None):
-	from frappe.model.mapper import get_mapped_doc
 	doc = frappe.get_doc('Purchase Receipt', source_name)
 	returned_qty_map = get_returned_qty_map(source_name)
 	invoiced_qty_map = get_invoiced_qty_map(source_name)
@@ -712,7 +711,8 @@ def make_stock_entry(source_name,target_doc=None):
 			"doctype": "Stock Entry Detail",
 			"field_map": {
 				"warehouse": "s_warehouse",
-				"parent": "reference_purchase_receipt"
+				"parent": "reference_purchase_receipt",
+				"batch_no": "batch_no"
 			},
 		},
 	}, target_doc, set_missing_values)
@@ -745,3 +745,19 @@ def get_item_account_wise_additional_cost(purchase_document):
 						account.amount * item.get(based_on_field) / total_item_cost
 
 	return item_account_wise_cost
+
+@frappe.whitelist()
+def make_production_plan(source_name, target_doc=None):
+	doc = get_mapped_doc("Purchase Receipt", source_name, {
+		"Purchase Receipt": {
+			"doctype": "Production Plan",
+		},
+		"Purchase Receipt Item": {
+			"doctype": "Production Plan Item",
+			"field_map": {
+				"item_code": "item_code",
+				"parent": "purchase_receipt",
+			}	
+		}
+	}, target_doc)
+	return doc

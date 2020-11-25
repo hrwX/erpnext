@@ -30,7 +30,8 @@
   "allow_stale",
   "stale_days",
   "report_settings_sb",
-  "use_custom_cash_flow"
+  "use_custom_cash_flow",
+  "statement_of_account_email_template"
  ],
  "fields": [
   {
@@ -188,12 +189,18 @@
    "fieldtype": "Select",
    "label": "Auto-Create Invoice on Delivery Note",
    "options": "\nSubmit\nDelivered"
+  },
+  {
+   "fieldname": "statement_of_account_email_template",
+   "fieldtype": "Link",
+   "label": "Statement of Account Email Template",
+   "options": "Email Template"
   }
  ],
  "icon": "icon-cog",
  "idx": 1,
  "issingle": 1,
- "modified": "2020-09-03 04:02:46.314533",
+ "modified": "2020-10-23 03:44:26.865590",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Accounts Settings",

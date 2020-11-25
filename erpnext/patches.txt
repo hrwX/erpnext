@@ -695,8 +695,12 @@ erpnext.patches.v13_0.update_delivery_note_status
 erpnext.patches.v13_0.delete_old_agri_doctypes
 erpnext.patches.v13_0.set_auto_create_invoice_on_delivery_note
 erpnext.patches.v13_0.update_item_master_doctype_field
+erpnext.patches.v13_0.update_delivery_note_status_to_in_transit
 erpnext.patches.v13_0.update_billed_qty_in_purchase_receipt
 erpnext.patches.v13_0.update_subscription
 execute:frappe.delete_doc_if_exists('DocType', 'Compliance Item')
 erpnext.patches.v13_0.harvest_stock_entry_type_added
 execute:frappe.delete_doc_if_exists('Custom Field', 'Stock Settings-autoname_item')
+erpnext.patches.v13_0.job_applicant_name_split
+erpnext.patches.v13_0.add_default_statement_of_account_email_template
+erpnext.patches.v13_0.create_default_issue_priorities

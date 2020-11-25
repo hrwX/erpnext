@@ -52,13 +52,14 @@ def get_cart_quotation(doc=None):
 
 @frappe.whitelist()
 def place_order():
+	"""Placing orders for items inside the shopping cart"""
+
+	#get the quotation in the cart and the cart settings
 	quotation = _get_cart_quotation()
 	cart_settings = frappe.db.get_value("Shopping Cart Settings", None,
 		["company", "allow_items_not_in_stock"], as_dict=1)
 	quotation.company = cart_settings.company
-
 	quotation.flags.ignore_permissions = True
-	quotation.submit()
 
 	if quotation.quotation_to == 'Lead' and quotation.party_name:
 		# company used to create customer accounts
@@ -67,12 +68,11 @@ def place_order():
 	if not (quotation.shipping_address_name or quotation.customer_address):
 		frappe.throw(_("Set Shipping Address or Billing Address"))
 
-	from erpnext.selling.doctype.quotation.quotation import _make_sales_order
-	sales_order = frappe.get_doc(_make_sales_order(quotation.name, ignore_permissions=True))
-	sales_order.payment_schedule = []
+	#We have migrated the order placement to the make_payment_entry function to accomodate quotations 
 
+	# Checking if items in quotation are in stock, if not throw an error
 	if not cint(cart_settings.allow_items_not_in_stock):
-		for item in sales_order.get("items"):
+		for item in quotation.get("items"):
 			item.reserved_warehouse, is_stock_item = frappe.db.get_value("Item",
 				item.item_code, ["website_warehouse", "is_stock_item"])
 
@@ -83,14 +83,7 @@ def place_order():
 				if item.qty > item_stock.stock_qty[0][0]:
 					throw(_("Only {0} in Stock for item {1}").format(item_stock.stock_qty[0][0], item.item_code))
 
-	sales_order.flags.ignore_permissions = True
-	sales_order.insert()
-	sales_order.submit()
-
-	if hasattr(frappe.local, "cookie_manager"):
-		frappe.local.cookie_manager.delete_cookie("cart_count")
-
-	return sales_order.name
+	return quotation.name
 
 @frappe.whitelist()
 def request_for_quotation():
@@ -578,17 +571,21 @@ def apply_coupon_code(applied_code, applied_referral_sales_partner):
 	quotation = True
 
 	if not applied_code:
-		frappe.throw(_("Please enter a coupon code"))
+		frappe.throw(_("Please enter a coupon code"), title=_("Coupon Error"))
 
 	coupon_list = frappe.get_all('Coupon Code', filters={'coupon_code': applied_code})
 	if not coupon_list:
-		frappe.throw(_("Please enter a valid coupon code"))
+		frappe.throw(_("Please enter a valid coupon code"), title=_("Coupon Error"))
 
 	coupon_name = coupon_list[0].name
 
 	from erpnext.accounts.doctype.pricing_rule.utils import validate_coupon_code
 	validate_coupon_code(coupon_name)
 	quotation = _get_cart_quotation()
+
+	if quotation.coupon_code and quotation.coupon_code == coupon_name:
+		frappe.throw(_("Coupon Code '{0}' already applied").format(coupon_name), title=_("Coupon Error"))
+
 	quotation.coupon_code = coupon_name
 	quotation.flags.ignore_permissions = True
 	quotation.save()

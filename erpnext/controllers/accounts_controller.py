@@ -81,6 +81,11 @@ class AccountsController(TransactionBase):
 			validate_return(self)
 			self.set_total_in_words()
 
+		if self.doctype in ['Purchase Invoice', 'Sales Invoice']:
+			pos_check_field = "is_pos" if self.doctype=="Sales Invoice" else "is_paid"
+			if cint(self.allocate_advances_automatically) and not cint(self.get(pos_check_field)):
+				self.set_advances()
+
 		self.validate_all_documents_schedule()
 
 		if self.meta.get_field("taxes_and_charges"):
@@ -94,10 +99,6 @@ class AccountsController(TransactionBase):
 			self.calculate_paid_amount()
 
 		if self.doctype in ['Purchase Invoice', 'Sales Invoice']:
-			pos_check_field = "is_pos" if self.doctype=="Sales Invoice" else "is_paid"
-			if cint(self.allocate_advances_automatically) and not cint(self.get(pos_check_field)):
-				self.set_advances()
-
 			if self.is_return:
 				self.validate_qty()
 			else:

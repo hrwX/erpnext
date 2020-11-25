@@ -37,10 +37,11 @@
   "retain_sample",
   "sample_quantity",
   "serial_no_batch",
+  "package_tag",
+  "coa_batch_no",
   "serial_no",
   "col_break4",
   "batch_no",
-  "package_tag",
   "quality_inspection",
   "accounting",
   "expense_account",
@@ -506,11 +507,19 @@
    "in_list_view": 1,
    "label": "Package Tag",
    "options": "Package Tag"
+  },
+  {
+   "fetch_from": "package_tag.coa_batch_no",
+   "fieldname": "coa_batch_no",
+   "fieldtype": "Link",
+   "label": "COA Batch",
+   "options": "Batch",
+   "read_only": 1
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2020-08-06 04:10:46.529496",
+ "modified": "2020-11-05 04:34:36.907887",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Stock Entry Detail",

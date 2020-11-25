@@ -6,6 +6,9 @@ from frappe import _
 def get_data():
 	return {
 		'fieldname': 'plant',
+		'non_standard_fieldnames': {
+			'Destroyed Plant Log': 'category'
+		},
 		'transactions': [
 			{
 				'label': _('Manicure & Harvesting'),
@@ -13,7 +16,7 @@ def get_data():
 			},
 			{
 				'label': _('Diseases & Additives'),
-				'items': ['Plant Disease Diagnosis', 'Plant Additive Log']
+				'items': ['Plant Disease Diagnosis', 'Plant Additive Log', 'Destroyed Plant Log']
 			}
 		]
 	}

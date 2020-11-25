@@ -270,6 +270,12 @@ def install(country=None):
 		'subject': _("Your order is out for delivery!"), 'owner': frappe.session.user}]
 
 	base_path = frappe.get_app_path("erpnext", "templates", "emails")
+	response = frappe.read_file(os.path.join(base_path, "statement_of_account_email_notification.html"))
+
+	records += [{'doctype': 'Email Template', 'name': "Statement of Account", 'response': response,\
+		'subject': "Statement of Account", 'owner': frappe.session.user}]
+
+	base_path = frappe.get_app_path("erpnext", "templates", "emails")
 	response = frappe.read_file(os.path.join(base_path, "birthday_email_notification.html"))
 
 	records += [{'doctype': 'Email Template', 'name': _("Birthday Email Notification"), 'response': response,\

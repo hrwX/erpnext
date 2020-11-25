@@ -57,6 +57,9 @@ status_map = {
 	],
 	"Delivery Note": [
 		["Draft", None],
+		["To Deliver", "eval: not self.delivered"],
+		["Delivered", "eval:self.status=='Delivered'"],
+		["In Transit", "eval:self.status=='In Transit'"],
 		["To Bill", "eval:self.per_billed < 100 and self.docstatus == 1"],
 		["Completed", "eval:self.per_billed == 100 and self.docstatus == 1"],
 		["Cancelled", "eval:self.docstatus==2"],

@@ -265,6 +265,7 @@
   },
   {
    "allow_on_submit": 1,
+   "fetch_from": "company.default_letter_head",
    "fieldname": "letter_head",
    "fieldtype": "Link",
    "label": "Letter Head",
@@ -272,8 +273,7 @@
   }
  ],
  "is_submittable": 1,
- "links": [],
- "modified": "2020-09-24 03:55:18.798485",
+ "modified": "2020-11-05 23:42:26.144864",
  "modified_by": "Administrator",
  "module": "CRM",
  "name": "Contract",

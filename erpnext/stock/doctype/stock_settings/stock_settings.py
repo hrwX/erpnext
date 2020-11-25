@@ -74,6 +74,6 @@ def clean_all_descriptions():
 
 def toggle_item_code_reqd(settings):
 	if settings.autoname_item:
-		make_property_setter("Item", "item_code", "reqd", 1, "Check")
+		make_property_setter("Item", "item_code", "reqd", 0, "Check")
 	else:
 		frappe.delete_doc_if_exists("Property Setter", "Item-item_code-reqd")

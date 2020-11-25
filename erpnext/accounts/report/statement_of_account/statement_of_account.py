@@ -3,12 +3,13 @@
 
 from __future__ import unicode_literals
 import frappe
+import json
 from erpnext import get_company_currency, get_default_company
 from frappe.utils import getdate, cstr, flt
 from frappe import _, _dict
 from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import get_accounting_dimensions, get_dimension_with_children
 from collections import OrderedDict
-from erpnext.accounts.report.general_ledger.general_ledger import validate_party, set_account_currency, get_totals_dict, get_balance
+from erpnext.accounts.report.general_ledger.general_ledger import set_account_currency, get_totals_dict, get_balance
 from frappe.contacts.doctype.address.address import get_default_address
 
 def execute(filters=None):
@@ -24,9 +25,6 @@ def execute(filters=None):
 	for acc in frappe.db.sql("""select name, is_group from tabAccount""", as_dict=1):
 		account_details.setdefault(acc.name, acc)
 
-	if filters.get('party'):
-		filters.party = frappe.parse_json(filters.get("party"))
-
 	validate_filters(filters, account_details)
 
 	if filters.get('party_type'):
@@ -39,6 +37,16 @@ def execute(filters=None):
 	res = get_result(filters, account_details)
 
 	return columns, res
+
+def validate_party(filters):
+	party_type, party = filters.get("party_type"), filters.get("party")
+
+	if party:
+		if not party_type:
+			frappe.throw(_("To filter based on Party, select Party Type first"))
+		else:
+			if not frappe.db.exists(party_type, party):
+				frappe.throw(_("Invalid {0}: {1}").format(party_type, party))
 
 
 def validate_filters(filters, account_details):
@@ -98,7 +106,7 @@ def get_conditions(filters):
 		conditions.append("party_type=%(party_type)s")
 
 	if filters.get("party"):
-		conditions.append("party in %(party)s")
+		conditions.append("party=%(party)s")
 
 	if not (filters.get("account") or filters.get("party")):
 		conditions.append("posting_date >=%(from_date)s")
@@ -267,10 +275,52 @@ def get_addresses(company=None, party_type=None, party=None):
 	if not (company and party_type and party):
 		return {}
 
-	company_addr = frappe.get_doc("Address", get_default_address("Company", company))
-	party_addr = frappe.get_doc("Address", get_default_address(party_type, party))
+	company_address, party_address = {}, {}
+	default_company_address = get_default_address("Company", company)
+	if default_company_address:
+		company_address = frappe.get_doc("Address", default_company_address)
+
+	default_party_address = get_default_address(party_type, party)
+	if default_party_address:
+		party_address = frappe.get_doc("Address", default_party_address)
 
 	return {
-		"company": company_addr,
-		"party": party_addr
+		"company": company_address,
+		"party": party_address
 	}
+
+@frappe.whitelist()
+def notify_party(filters, report, html=None):
+	filters = frappe._dict(json.loads(filters))
+	report = frappe._dict(json.loads(report))
+	attachments = [frappe.attach_print(report.doctype, report.report_name, html=html)]
+	party = frappe.db.get_value(filters.party_type, filters.party, "email_id")
+
+	if not party:
+		frappe.throw(_("Email id is not mentioned in the {0} master for {1}.").format(filters.party_type, frappe.bold(filters.party)))
+
+	#soa_template = soa template stand for statement of account template
+	soa_template = frappe.db.get_single_value("Accounts Settings", "statement_of_account_email_template")
+
+	if soa_template:
+		email_template = frappe.get_doc("Email Template", soa_template)
+		message = frappe.render_template(email_template.response, {
+			"party": filters.party,
+			"from_date": filters.from_date,
+			"to_date": filters.to_date
+		})
+		subject = email_template.subject
+	else:
+		subject = report.report_name,
+		message = (_("Statement of Account of {0} {1} for period {2} to {3}").format(filters.party_type, frappe.bold(filters.party), frappe.bold(filters.from_date), frappe.bold(filters.to_date)))
+
+	frappe.sendmail(
+		recipients = [party],
+		subject = subject,
+		message = message,
+		attachments = attachments,
+		reference_doctype = report.doctype,
+		reference_name = report.report_name
+	)
+
+	return party

@@ -60,37 +60,34 @@ frappe.query_reports["Statement of Account"] = {
 			label: __("Party Type"),
 			fieldtype: "Link",
 			options: "Party Type",
-			default: "",
+			default: "Customer",
+			"get_query": function() {
+				return {
+					filters: {"name": ["in", ["Customer"]]}
+				}
+			},
 			on_change: function (report) {
 				frappe.query_report.set_filter_value("party", "");
 				get_addresses(report);
 			},
 		},
 		{
-			fieldname: "party",
-			label: __("Party"),
-			fieldtype: "MultiSelectList",
-			get_data: function (txt) {
-				if (!frappe.query_report.filters) {
-					return true;
-				}
-				let party_type = frappe.query_report.get_filter_value("party_type");
-				if (!party_type) {
-					return true;
-				}
-
-				return frappe.db.get_link_options(party_type, txt);
+			"fieldname":"party",
+			"label": __("Party"),
+			"fieldtype": "Link",
+			get_options: function () {
+				let party_type = frappe.query_report.get_filter_value('party_type');
+				return party_type;
 			},
 			on_change: function (report) {
-				var party_type = frappe.query_report.get_filter_value("party_type");
-				var parties = frappe.query_report.get_filter_value("party");
+				let party_type = frappe.query_report.get_filter_value("party_type");
+				let party = frappe.query_report.get_filter_value("party");
 
-				if (!party_type || parties.length === 0 || parties.length > 1) {
+				if (!party_type) {
 					frappe.query_report.set_filter_value("party_name", "");
 					return;
 				} else {
-					var party = parties[0];
-					var fieldname = erpnext.utils.get_party_name(party_type) || "name";
+					let fieldname = erpnext.utils.get_party_name(party_type) || "name";
 					frappe.db.get_value(party_type, party, fieldname, function (value) {
 						frappe.query_report.set_filter_value(
 							"party_name",
@@ -109,6 +106,54 @@ frappe.query_reports["Statement of Account"] = {
 			hidden: 1,
 		},
 	],
+	onload: function(report) {
+		report.page.add_inner_button(__("Notify Party via Email"), function() {
+			var filters = report.get_values();
+			let reporter = frappe.query_reports["Statement of Account"];
+
+			//Always make a new one so that the latest values get updated
+			reporter.notify_party(report, filters);
+		});
+	},
+
+	get_visible_columns() {
+		const visible_column_ids = this.datatable.datamanager.getColumns(true).map(col => col.id);
+
+		return visible_column_ids
+			.map(id => this.columns.find(col => col.id === id))
+			.filter(Boolean);
+	},
+	notify_party: function (report, filters) {
+		function email_report(report, print_settings) {
+			let html = report.pdf_report(print_settings, true);
+			frappe.call({
+				method: "erpnext.accounts.report.statement_of_account.statement_of_account.notify_party",
+				args: {
+					"filters": filters,
+					"report": report.report_doc,
+					"html": html
+				},
+				callback: function (r) {
+					if (r && r.message) {
+						frappe.msgprint(__("{0} has been successfully sent to {1}", [report.report_name, r.message.bold()]));
+					}
+				}
+			});
+		}
+		if (!filters.party.length) {
+			frappe.throw(__("Missing Party filter value."));
+		} else {
+			frappe.confirm(__("Do you want to notify the {0} by email?", [filters.party_type]), function () {
+				let dialog = frappe.ui.get_print_settings(
+					false,
+					print_settings => email_report(report, print_settings),
+					report.report_doc.letter_head,
+					report.get_visible_columns()
+				);
+				report.add_portrait_warning(dialog);
+			});
+		}
+	}
 };
 
 erpnext.utils.add_dimensions("Statement of Account", 15);
@@ -116,7 +161,7 @@ erpnext.utils.add_dimensions("Statement of Account", 15);
 function get_addresses(report) {
 	let filters = report.get_filter_values();
 
-	if (!filters.company || !filters.party_type || !filters.party[0]) {
+	if (!filters.company || !filters.party_type || !filters.party) {
 		return;
 	}
 
@@ -126,10 +171,12 @@ function get_addresses(report) {
 		args: {
 			company: filters.company,
 			party_type: filters.party_type,
-			party: filters.party[0],
+			party: filters.party,
 		},
 		callback: function (r) {
-			report.addresses = r.message;
-		},
+			if (r.message) {
+				report.addresses = r.message;
+			}
+		}
 	});
 }

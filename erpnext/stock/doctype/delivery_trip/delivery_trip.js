@@ -155,8 +155,11 @@ frappe.ui.form.on('Delivery Trip', {
 										frm.reload_doc();
 									}
 								})
-								for(let stops of frm.doc.delivery_stops){
-									frappe.db.set_value("Delivery Note", stops.delivery_note, "status", "Out for Delivery")
+								// update status of delivery note to "In Transit" when user starts delivery trip
+								for (let stop of frm.doc.delivery_stops) {
+									if (stop.delivery_note) {
+										frappe.db.set_value("Delivery Note", stop.delivery_note, "status", "In Transit");
+									}
 								}
 							},
 							__("Enter Odometer Value"));
@@ -477,32 +480,6 @@ frappe.ui.form.on('Delivery Stop', {
 		}
 	},
 
-	visited: function (frm, cdt, cdn) {
-		var row = locals[cdt][cdn];
-		if (row.visited) {
-			frappe.db.get_value("Sales Invoice", row.sales_invoice, "status")
-				.then(status => {
-					frappe.db.set_value("Delivery Note", row.delivery_note, "delivered", 1)
-					if (status.message.status === "Unpaid") {
-						frappe.db.set_value("Delivery Note", row.delivery_note, "status", "Delivered")
-					}
-					if (status.message.status === "Paid") {
-						frappe.db.set_value("Delivery Note", row.delivery_note, "status", "Completed")
-					}
-				})
-		}
-
-		if (row.visited && row.sales_invoice) {
-			if (row.paid_amount !== row.grand_total) {
-				frappe.call({
-					method: "erpnext.stock.doctype.delivery_trip.delivery_trip.update_payment_due_date",
-					args: {
-						sales_invoice: row.sales_invoice
-					}
-				})
-			}
-		}
-	},
 
 	make_payment_entry: function (frm, cdt, cdn) {
 		const row = frm.selected_doc || locals[cdt][cdn];

@@ -105,6 +105,16 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 				if(!item.warehouse && frm.doc.set_warehouse) {
 					item.warehouse = frm.doc.set_warehouse;
 				}
+				frm.cscript.set_and_update_cultivation_tax();
+			},
+			items_remove: function(frm) {
+				frm.cscript.set_and_update_cultivation_tax();
+			},
+			rate: function(frm) {
+				frm.cscript.set_and_update_cultivation_tax();
+			},
+			qty: function(frm) {
+				frm.cscript.set_and_update_cultivation_tax();
 			}
 		});
 
@@ -264,7 +274,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 
 	make_payment_request: function() {
 		var me = this;
-		const payment_request_type = (in_list(['Sales Order', 'Sales Invoice'], this.frm.doc.doctype))
+		const payment_request_type = (in_list(["Quotation", 'Sales Order', 'Sales Invoice'], this.frm.doc.doctype))
 			? "Inward" : "Outward";
 
 		frappe.call({

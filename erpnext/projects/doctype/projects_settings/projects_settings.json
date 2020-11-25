@@ -1,5 +1,4 @@
 {
- "actions": [],
  "creation": "2018-02-21 16:42:13.882879",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -9,8 +8,11 @@
   "ignore_workstation_time_overlap",
   "ignore_user_time_overlap",
   "ignore_employee_time_overlap",
+  "projects_section",
+  "send_notifications_for_project",
   "tasks_sb",
-  "remove_assignment_on_task_completion"
+  "remove_assignment_on_task_completion",
+  "send_notifications_for_task"
  ],
  "fields": [
   {
@@ -46,11 +48,29 @@
    "fieldname": "tasks_sb",
    "fieldtype": "Section Break",
    "label": "Tasks"
+  },
+  {
+   "default": "0",
+   "description": "Send Notifications to Assigned User on Task update.",
+   "fieldname": "send_notifications_for_task",
+   "fieldtype": "Check",
+   "label": "Send Notifications for Task"
+  },
+  {
+   "fieldname": "projects_section",
+   "fieldtype": "Section Break",
+   "label": "Projects"
+  },
+  {
+   "default": "0",
+   "description": "Send Notifications to Assigned User on Project update.",
+   "fieldname": "send_notifications_for_project",
+   "fieldtype": "Check",
+   "label": "Send Notifications for Project"
   }
  ],
  "issingle": 1,
- "links": [],
- "modified": "2020-06-24 05:15:20.901323",
+ "modified": "2020-11-04 21:34:03.214754",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Projects Settings",

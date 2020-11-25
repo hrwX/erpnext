@@ -676,7 +676,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 			if (df.fieldtype === 'Code') {
 				return value;
 			} else if (df.fieldtype === 'Percent') {
-				return `<div class="progress level" style="margin: 0px;">
+				return `<div class="progress level m-0">
 						<div class="progress-bar progress-bar-success" role="progressbar"
 							aria-valuenow="${value}"
 							aria-valuemin="0" aria-valuemax="100" style="width: ${Math.round(value)}%;">
@@ -705,7 +705,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 
 			if (df.fieldtype === 'Image') {
 				html = df.options ?
-					`<img src="${doc[df.options]}" style="max-level: 30px; max-width: 100%;">` :
+					`<img src="${doc[df.options]}" class="w-100">`:
 					`<div class="missing-image small">
 						<span class="octicon octicon-circle-slash"></span>
 					</div>`;
@@ -773,15 +773,15 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 
 		const subject_link = this.get_subject_link(doc, subject, escaped_subject);
 
-		let html = doc.doctype == 'Task' && doc.expandable ? `<a class="btn btn-action btn-xs"
-			data-doctype="Task" data-name="${escape(doc.name)}" style="width: 20px;">
+		let html = doc.doctype == 'Task' && doc.expandable ? `<a class="btn btn-action btn-xs w-20"
+			data-doctype="Task" data-name="${escape(doc.name)}">
 				<i class="octicon octicon-chevron-right" />
 			</a>` : ``;
 
 
 		let subject_html = `
 			<input class="level-item list-row-checkbox hidden-xs" type="checkbox" data-name="${escape(doc.name)}">
-			<span class="level-item" style="margin-bottom: 1px;">
+			<span class="level-item">
 				<i class="octicon octicon-heart like-action ${heart_class}"
 					data-name="${doc.name}" data-doctype="${doc.doctype}"
 					data-liked-by="${encodeURI(doc._liked_by) || '[]'}">
@@ -791,7 +791,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 				</span>
 			</span>
 			<span class="level-item ${seen} ellipsis" title="${escaped_subject}" style="padding-left: ${20*level}px;">
-				<span class="level-item" style="margin-bottom: 1px;"">
+				<span class="level-item">
 					${html}
 				</span>
 				${subject_link}
@@ -877,7 +877,7 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 
 	get_open_button(doc) {
 		return `
-				<div class="level-item hidden-xs" style="margin-left: 5px;">
+				<div class="level-item hidden-xs ml-5">
 					<button class="btn btn-open btn-default btn-xs"
 						data-doctype="${escape(doc.doctype)}" data-name="${escape(doc.name)}">
 						${__("Open")}
@@ -953,11 +953,11 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 			<header class="level list-row list-row-head text-muted small">
 				<a class="btn btn-prev btn-xs">
 					<i class="octicon octicon-chevron-left" />
-					<span style="margin-left: 5px">Projects</span>
+					<span class="ml-5">Projects</span>
 				</a>
-				<button class="btn btn-xs expand-all btn-default" style="float: right">
+				<button class="btn btn-xs expand-all btn-default float-right">
 					${__('Expand All')}</button>
-				<button class="btn btn-xs collapse-all btn-default" style="float: right; display: none">
+				<button class="btn btn-xs collapse-all btn-default float-right d-none">
 					${__('Collapse All')}</button>
 			</header>
 		`;

@@ -8,7 +8,6 @@
   "is_compliance_enabled",
   "sb_metrc_settings",
   "metrc_url",
-  "metrc_license_no",
   "cb_metrc",
   "metrc_vendor_key",
   "metrc_user_key",
@@ -39,12 +38,6 @@
    "label": "URL"
   },
   {
-   "fieldname": "metrc_license_no",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "License No"
-  },
-  {
    "fieldname": "cb_metrc",
    "fieldtype": "Column Break"
   },
@@ -73,7 +66,7 @@
   }
  ],
  "issingle": 1,
- "modified": "2020-11-22 22:35:11.900614",
+ "modified": "2020-11-26 04:55:47.274738",
  "modified_by": "Administrator",
  "module": "Compliance",
  "name": "Compliance Settings",

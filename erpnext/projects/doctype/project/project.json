@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:project_name",
@@ -11,6 +10,7 @@
   "project_name",
   "status",
   "project_type",
+  "project_team",
   "is_active",
   "percent_complete_method",
   "percent_complete",
@@ -447,13 +447,18 @@
    "fieldname": "billable",
    "fieldtype": "Check",
    "label": "Billable"
+  },
+  {
+   "fieldname": "project_team",
+   "fieldtype": "Link",
+   "label": "Project Team",
+   "options": "Project Team"
   }
  ],
  "icon": "fa fa-puzzle-piece",
  "idx": 29,
- "links": [],
  "max_attachments": 4,
- "modified": "2020-07-28 03:04:33.939579",
+ "modified": "2020-11-11 03:29:29.658278",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Project",

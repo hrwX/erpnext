@@ -7,7 +7,7 @@ import json
 
 import frappe
 from frappe import _, throw
-from frappe.desk.form.assign_to import clear, close_all_assignments
+from frappe.desk.form.assign_to import clear, close_all_assignments, add
 from frappe.model.mapper import get_mapped_doc
 from frappe.utils import add_days, cstr, date_diff, get_link_to_form, getdate, today
 from frappe.utils.nestedset import NestedSet
@@ -55,6 +55,7 @@ class Task(NestedSet):
 			dependent_task_list.remove(self.name)
 			dependent_task_string = ','.join(map(str, dependent_task_list))
 			frappe.db.set_value("Task", parent_task, "depends_on_tasks", dependent_task_string)
+
 
 	def validate_dates(self):
 		if self.exp_start_date and self.exp_end_date and getdate(self.exp_start_date) > getdate(self.exp_end_date):
@@ -112,6 +113,7 @@ class Task(NestedSet):
 		self.unassign_todo()
 		self.populate_depends_on()
 		self.notify()
+		self.assign_todo()
 
 	def unassign_todo(self):
 		if self.status == "Completed" and frappe.db.get_single_value("Projects Settings", "remove_assignment_on_task_completion"):
@@ -119,6 +121,16 @@ class Task(NestedSet):
 		if self.status == "Cancelled":
 			clear(self.doctype, self.name)
 
+	def assign_todo(self):
+		# Creating ToDo for assigned user.
+		if self.assign_to:
+			assign_to = [assign_to.user for assign_to in self.assign_to]
+			add({
+				'doctype': self.doctype,
+				"name": self.name,
+				'assign_to': assign_to
+			})
+	
 	def update_total_expense_claim(self):
 		self.total_expense_claim = frappe.db.sql("""select sum(total_sanctioned_amount) from `tabExpense Claim`
 			where project = %s and task = %s and docstatus=1""",(self.project, self.name))[0][0]
@@ -246,7 +258,9 @@ def get_project(doctype, txt, searchfield, start, page_len, filters):
 				'page_len': page_len
 			})
 
-
+def get_team_members (doctype, txt, searchfield, start, page_len, filters):
+	return frappe.get_all("Project Team Members", {"parent": filters.get("team")}, ["user", "user_name"], as_list=1)
+	
 @frappe.whitelist()
 def set_multiple_status(names, status):
 	names = json.loads(names)

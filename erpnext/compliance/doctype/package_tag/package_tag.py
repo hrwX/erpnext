@@ -20,3 +20,32 @@ class PackageTag(Document):
 
 	def update_coa_batch_no(self):
 		self.coa_batch_no = frappe.db.get_value("Package Tag", self.source_package_tag, "coa_batch_no")
+
+
+@frappe.whitelist()
+def get_package_tag_qty(package_tag=None):
+	out = 0
+
+	if package_tag:
+		out = frappe.db.sql('''select warehouse, sum(actual_qty) as qty
+			from `tabStock Ledger Entry`
+			where package_tag=%s
+			group by warehouse''', package_tag, as_dict=1)
+
+	return out
+
+@frappe.whitelist()
+def make_stock_reconciliation(item_code, batch_no, package_tag, qty, warehouse, adjustment_reason):
+	stock_reco = frappe.new_doc("Stock Reconciliation")
+	stock_reco.purpose = "Stock Reconciliation"
+	stock_reco.append("items", {
+			"item_code": item_code,
+			"qty": qty,
+			"warehouse": warehouse,
+			"package_tag": package_tag,
+			"batch_no": batch_no,
+			"adjustment_reason": adjustment_reason
+		})
+	stock_reco.submit()
+	frappe.db.commit()
+	return stock_reco

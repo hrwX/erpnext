@@ -1,5 +1,4 @@
 {
- "actions": [],
  "autoname": "naming_series:",
  "creation": "2019-05-03 00:09:51.963540",
  "doctype": "DocType",
@@ -12,6 +11,7 @@
   "cb_waste",
   "disposal_date",
   "disposal_time",
+  "package_tag",
   "sb_items",
   "items",
   "amended_from"
@@ -83,11 +83,16 @@
    "options": "Waste Disposal",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "package_tag",
+   "fieldtype": "Link",
+   "label": "Package Tag",
+   "options": "Package Tag"
   }
  ],
  "is_submittable": 1,
- "links": [],
- "modified": "2020-08-04 04:58:17.923986",
+ "modified": "2020-10-20 02:34:18.846300",
  "modified_by": "Administrator",
  "module": "Compliance",
  "name": "Waste Disposal",

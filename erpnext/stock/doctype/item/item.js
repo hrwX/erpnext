@@ -7,7 +7,10 @@ frappe.ui.form.on("Item", {
 	setup: function(frm) {
 		frm.make_methods = {
 			'Purchase Order': () => {
-				create_purchase_order(frm);
+				frappe.model.open_mapped_doc({
+					method: 'erpnext.stock.doctype.item.item.make_purchase_order_item_default_supplier',
+					frm: frm
+				});
 			}
 		}
 		frm.add_fetch('attribute', 'numeric_values', 'numeric_values');
@@ -220,8 +223,12 @@ frappe.ui.form.on("Item", {
 		}
 	},
 
-	set_meta_tags(frm) {
+	set_meta_tags: function(frm) {
 		frappe.utils.set_meta_tag(frm.doc.route);
+	},
+
+	create_purchase_order: function(frm) {
+		create_purchase_order(frm);
 	}
 });
 
@@ -808,16 +815,6 @@ frappe.ui.form.on("Item Supplier", {
 function create_purchase_order(frm) {
 	let suppliers = [];
 
-	frm.doc.item_defaults.forEach(d => {
-		if (d.default_supplier) {
-			suppliers.push({
-				supplier: d.default_supplier,
-				price_list: d.default_price_list,
-				is_default: true
-			});
-		}
-	});
-
 	frm.doc.supplier_items.forEach(d => {
 		suppliers.push({
 			supplier: d.supplier,
@@ -836,20 +833,13 @@ function create_purchase_order(frm) {
 						<div class="field-area" style="display: none;"></div>
 						<div class="static-area ellipsis">${s.supplier}</div>
 					</div>
-					<div class="col grid-static-col col-xs-3 " data-fieldname="price_list" data-fieldtype="Select">
+					<div class="col grid-static-col col-xs-4 " data-fieldname="price_list" data-fieldtype="Select">
 						<div class="field-area" style="display: none;"></div>
 						<div class="static-area ellipsis">${s.price_list ? s.price_list : ``}</div>
 					</div>
-					<div class="col grid-static-col col-xs-2 " data-fieldname="price_list_rate" data-fieldtype="Select">
+					<div class="col grid-static-col col-xs-3 " data-fieldname="price_list_rate" data-fieldtype="Select">
 						<div class="field-area" style="display: none;"></div>
 						<div class="static-area ellipsis">${s.price_list_rate ? s.price_list_rate : ``}</div>
-					</div>
-					<div class="col grid-static-col col-xs-2 " data-fieldname="default" data-fieldtype="Select">
-						<div class="field-area" style="display: none;"></div>
-						<div class="static-area ellipsis"></div>
-						${s.is_default ? `<span class="disp-area bold" style="display: inline;">
-								<i class="fa fa-check" style="margin-right: 3px;"></i>
-							</span>` : ``}
 					</div>
 					<div class="col grid-static-col col-xs-1 ">
 						<button class="btn btn-new btn-default btn-xs" data-supplier="${s.supplier}" data-price_list="${s.price_list ? s.price_list : ``}">
@@ -873,17 +863,13 @@ function create_purchase_order(frm) {
 								<div class="field-area" style="display: none;"></div>
 								<div class="static-area ellipsis">Supplier</div>
 							</div>
-							<div class="col grid-static-col col-xs-3 " data-fieldname="price_list" data-fieldtype="Select">
+							<div class="col grid-static-col col-xs-4 " data-fieldname="price_list" data-fieldtype="Select">
 								<div class="field-area" style="display: none;"></div>
 								<div class="static-area ellipsis">Price List</div>
 							</div>
-							<div class="col grid-static-col col-xs-2 " data-fieldname="price_list_rate" data-fieldtype="Select">
+							<div class="col grid-static-col col-xs-3 " data-fieldname="price_list_rate" data-fieldtype="Select">
 								<div class="field-area" style="display: none;"></div>
 								<div class="static-area ellipsis">Rate</div>
-							</div>
-							<div class="col grid-static-col col-xs-2 " data-fieldname="default" data-fieldtype="Select">
-								<div class="field-area" style="display: none;"></div>
-								<div class="static-area ellipsis">Default</div>
 							</div>
 						</div>
 					</div>

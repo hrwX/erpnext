@@ -263,7 +263,7 @@ class Subscription(Document):
 		end_date = add_to_date(self.start_date, **billing_cycle_info)
 
 		if self.end_date and getdate(self.end_date) <= getdate(end_date):
-			frappe.throw(_('Subscription End Date must be after {0} as per the subscription plan').format(end_date))
+			frappe.throw(_('Subscription End Date must be after {0} as per the subscription plan').format(frappe.utils.formatdate(end_date, "mm-dd-yyyy")))
 
 	def validate_to_follow_calendar_months(self):
 		if self.follow_calendar_months:

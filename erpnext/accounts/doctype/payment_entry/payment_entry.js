@@ -157,6 +157,11 @@ frappe.ui.form.on('Payment Entry', {
 		erpnext.utils.get_contact_details(frm);
 	},
 
+	mode_of_payment: function (frm) {
+		frm.toggle_reqd('reference_no', frm.doc.mode_of_payment === "Check");
+		frm.toggle_reqd('reference_date', frm.doc.mode_of_payment === "Check");
+	},
+
 	hide_unhide_fields: function(frm) {
 		var company_currency = frm.doc.company? frappe.get_doc(":Company", frm.doc.company).default_currency: "";
 

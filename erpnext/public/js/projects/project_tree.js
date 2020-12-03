@@ -31,9 +31,25 @@ erpnext.projects.ProjectTree = class Projects extends frappe.views.BaseList {
 		this.set_title("Projects");
 		this.set_menu_items("Project");
 		this.set_breadcrumbs();
+		this.set_menu_items();
 	}
 
 	set_menu_items(doctype) {
+		this.secondary_action = {
+			label: __('Refresh'),
+			action: () => this.refresh()
+		};
+
+		const $secondary_action = this.page.set_secondary_action(
+			this.secondary_action.label,
+			this.secondary_action.action,
+			this.secondary_action.icon
+		);
+		if (!this.secondary_action.icon) {
+			$secondary_action.addClass('hidden-xs');
+		} else {
+			$secondary_action.addClass('visible-xs');
+		}
 
 		const bulk_delete = () => {
 			return {

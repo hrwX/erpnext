@@ -11,6 +11,15 @@ frappe.ui.form.on("Task", {
 			}
 		});
 
+		frm.set_query("assign_to", () => {
+			return {
+				query: "erpnext.projects.doctype.task.task.get_team_members",
+				filters: {
+					team: frm.doc.team
+				}
+			};
+		});
+
 		frm.make_methods = {
 			'Timesheet': () => frappe.model.open_mapped_doc({
 				method: 'erpnext.projects.doctype.task.task.make_timesheet',

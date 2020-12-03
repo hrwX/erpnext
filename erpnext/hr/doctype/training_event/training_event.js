@@ -2,6 +2,15 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Training Event', {
+	setup: function (frm) {
+		frm.set_query('employee', 'employees', function () {
+			return {
+				filters: {
+					"status": "Active"
+				}
+			};
+		});
+	},
 	onload_post_render: function(frm) {
 		frm.get_field("employees").grid.set_multiple_add("employee");
 	},

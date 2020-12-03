@@ -78,6 +78,10 @@ def get_gl_entries(filters):
 			`tabPayment Entry` PE
 		ON
 			GLE.voucher_no=PE.name
+		INNER JOIN
+			`tabPayment Schedule` PS
+		ON
+			GLE.against_voucher=PS.parent
 		Where
 			GLE.company=%(company)s AND (GLE.party IS NOT NULL)
 			{conditions}
@@ -106,7 +110,7 @@ def get_conditions(filters):
 	if not (filters.get("account") or filters.get("party")):
 		conditions.append("GLE.posting_date >=%(from_date)s")
 
-	conditions.append("(GLE.posting_date <=%(to_date)s and GLE.voucher_type != GLE.against_voucher_type) and GLE.posting_date != SI.posting_date")
+	conditions.append("(GLE.posting_date <=%(to_date)s and GLE.voucher_type != GLE.against_voucher_type) and GLE.posting_date != SI.posting_date and PS.credit_days != 0")
 
 	from frappe.desk.reportview import build_match_conditions
 	match_conditions = build_match_conditions("GL Entry")

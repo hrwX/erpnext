@@ -10,7 +10,8 @@
 	],
 	"js/erpnext-web.min.js": [
 		"public/js/website_utils.js",
-		"public/js/shopping_cart.js"
+		"public/js/shopping_cart.js",
+		"public/js/utils/card_validator.js"
 	],
 	"css/erpnext-web.css": [
 		"public/scss/website.scss"
@@ -54,7 +55,8 @@
 		"public/js/hub/hub_factory.js",
 		"public/js/call_popup/call_popup.js",
 		"public/js/utils/dimension_tree_filter.js",
-		"public/js/projects/project_tree.js"
+		"public/js/projects/project_tree.js",
+		"public/js/utils/card_validator.js"
 	],
 	"js/item-dashboard.min.js": [
 		"stock/dashboard/item_dashboard.html",

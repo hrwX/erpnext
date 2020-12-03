@@ -223,7 +223,24 @@ def authorize_payment(affirm_data, reference_doctype, reference_docname, integra
 	"""
 		once callback return checkout token it will authroized payment status as failed or sucessful
 	"""
+	payment_request = frappe.get_doc(reference_doctype, reference_docname)
 	redirect_url = "/integrations/payment-failed"
+
+	#if the payment request generated from a quotation, we convert quotation to sale order
+	if payment_request.reference_doctype == "Quotation" and not affirm_data.get("type") == "invalid_request":
+		
+		#we get the quotation document and submit it
+		quotation = frappe.get_doc(payment_request.reference_doctype, payment_request.reference_name)
+		quotation.save(ignore_permissions=True)
+		quotation.submit()
+
+		#convert the quotation to a sales order
+		from erpnext.selling.doctype.quotation.quotation import _make_sales_order
+		sales_order = frappe.get_doc(_make_sales_order(quotation.name, ignore_permissions=True))
+		sales_order.payment_schedule = []
+		sales_order.flags.ignore_permissions = True
+		sales_order.insert()
+		#payment entry is made for affirm when it is captured in the sales order document in frappe desk
 
 	# check if callback already happened
 	if affirm_data.get("status_code") == 400 and affirm_data.get("code") == "checkout-token-used":
@@ -234,38 +251,37 @@ def authorize_payment(affirm_data, reference_doctype, reference_docname, integra
 		frappe.msgprint(affirm_data.get("message"))
 		redirect_url = "/cart"
 	else:
-		payment_successful(affirm_data, reference_doctype, reference_docname, integration_request)
+		payment_successful(affirm_data, sales_order)
+		integration_request.update_status(affirm_data, "Completed")
 		redirect_url = '/integrations/payment-success'
 
 	frappe.local.response["type"] = "redirect"
 	frappe.local.response["location"] = get_url(redirect_url)
 	return ""
 
-def payment_successful(affirm_data, reference_doctype, reference_docname, integration_request):
+def payment_successful(affirm_data, order_doc):
 	"""
-		on sucessful payment response it will create payment entry for refernce docname and
-		update Affirm ID and Affirm status in refrence docname
+		on sucessful payment response it will create payment entry for reference docname and
+		update Affirm ID and Affirm status in reference docname
 	"""
-	charge_id = affirm_data.get('id')
-	affirm_capture_status = affirm_data.get('status')
-	payment_request = frappe.get_doc(reference_doctype, reference_docname)
-	order_doc = frappe.get_doc(payment_request.reference_doctype, affirm_data.get('order_id'))
-	order_doc.affirm_id = charge_id
-	order_doc.affirm_status = affirm_capture_status
-	order_doc.flags.ignore_permissions = 1
-	order_doc.save()
+	order_doc.affirm_id = affirm_data.get('id')
+	order_doc.affirm_status = affirm_data.get('status')
+	order_doc.save(ignore_permissions=True)
+	order_doc.submit()
 	frappe.db.commit()
-	integration_request.update_status(affirm_data, "Completed")
 
 @frappe.whitelist()
 def capture_payment(affirm_id, sales_order):
 	"""
-		Capture the funds of an authorized charge, similar to capturing a credit card transaction.
+		Capture the payment from affirm on a customer's sales order. Create a new integration request for 
+		the capture. Update the status of the sales order to paid and the integration request to Completed
 	"""
 	affirm_data ={
 		"affirm_id":affirm_id,
 		"sales_order":sales_order
 	}
+
+	#create a new integration request for capturing the affirm payment
 	integration_request = create_request_log(affirm_data, "Host", "Affirm")
 	affirm_settings = get_api_config()
 	authorization_response = requests.post(
@@ -274,22 +290,35 @@ def capture_payment(affirm_id, sales_order):
 			affirm_settings.get('public_api_key'),
 			affirm_settings.get('private_api_key')),
 		)
+
+	#if the payment capture is authorized, update status of affirm in the sales order and integration_req
 	if authorization_response.status_code==200:
 		affirm_data = authorization_response.json()
-		#make payment entry agianst Sales Order
 		integration_request.update_status(affirm_data, "Authorized")
-		make_so_payment_entry(affirm_data, sales_order, integration_request)
-		return affirm_data
+		frappe.db.set_value("Sales Order", sales_order, 
+			"affirm_status", authorization_response.json().get("status"))
+		make_so_payment_entry(affirm_data, sales_order)
+		integration_request.update_status(affirm_data, "Completed")
+	
 	else:
+		#if payment capture fails
 		integration_request.update_status(affirm_data, "Failed")
+		integration_request.error = authorization_response.reason
+		integration_request.save()
 		frappe.throw("Something went wrong.")
 
-def make_so_payment_entry(affirm_data, sales_order, integration_request):
-	payment_entry = get_payment_entry(dt="Sales Order", dn=sales_order, bank_amount=affirm_data.get("amount"))
+	integration_request.save()
+	return affirm_data
+
+def make_so_payment_entry(affirm_data, sales_order):
+	""" Make a payment entry for the sales order and update the integration request 
+	status to Completed"""
+
+	payment_entry = get_payment_entry(dt="Sales Order", dn=sales_order, 
+											bank_amount=affirm_data.get("amount"))
 	payment_entry.reference_no = affirm_data.get("transaction_id")
 	payment_entry.reference_date = getdate(affirm_data.get("created"))
 	payment_entry.submit()
-	integration_request.update_status(affirm_data, "Completed")
 
 @frappe.whitelist(allow_guest=1)
 def get_public_config():

@@ -1141,6 +1141,19 @@ def on_doctype_update():
 	frappe.db.add_index("Item", ["route(500)"])
 
 @frappe.whitelist()
+def make_purchase_order_item_default_supplier(source_name, target_doc=None):
+	item= frappe.get_doc("Item", source_name)
+	doc = frappe.new_doc("Purchase Order")
+
+	if item.item_defaults and item.item_defaults[0].default_supplier:
+		doc.supplier = item.item_defaults[0].default_supplier
+
+	if item.item_defaults and item.item_defaults[0].default_price_list:
+		doc.buying_price_list = item.item_defaults[0].default_price_list
+
+	return doc
+
+@frappe.whitelist()
 def make_purchase_order_item(source_name, target_doc=None):
 	item= frappe.get_doc("Item", source_name)
 	doc = frappe.new_doc("Purchase Order")

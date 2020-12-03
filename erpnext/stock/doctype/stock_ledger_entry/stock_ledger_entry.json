@@ -9,6 +9,7 @@
   "item_code",
   "serial_no",
   "batch_no",
+  "package_tag",
   "warehouse",
   "posting_date",
   "posting_time",
@@ -19,6 +20,7 @@
   "incoming_rate",
   "outgoing_rate",
   "stock_uom",
+  "compliance_uom",
   "qty_after_transaction",
   "valuation_rate",
   "stock_value",
@@ -269,13 +271,25 @@
    "hidden": 1,
    "label": "To Rename",
    "search_index": 1
+  },
+  {
+   "fieldname": "package_tag",
+   "fieldtype": "Link",
+   "label": "Package Tag",
+   "options": "Package Tag"
+  },
+  {
+   "fieldname": "compliance_uom",
+   "fieldtype": "Link",
+   "label": "Compliance UOM",
+   "options": "Compliance UOM"
   }
  ],
  "hide_toolbar": 1,
  "icon": "fa fa-list",
  "idx": 1,
  "in_create": 1,
- "modified": "2020-02-25 22:53:33.504681",
+ "modified": "2020-10-23 05:42:52.164730",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Stock Ledger Entry",

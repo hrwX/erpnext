@@ -10,5 +10,8 @@
   "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/frappe/erpnext/issues"
+  },
+  "dependencies": {
+    "card-validator": "^8.1.0"
   }
 }

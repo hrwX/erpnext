@@ -56,6 +56,7 @@
   "section_break_31",
   "column_break_33a",
   "total_qty",
+  "per_picked",
   "base_total",
   "base_net_total",
   "column_break_33",
@@ -1023,7 +1024,7 @@
    "no_copy": 1,
    "oldfieldname": "status",
    "oldfieldtype": "Select",
-   "options": "\nDraft\nOn Hold\nTo Deliver and Bill\nTo Bill\nTo Deliver\nCompleted\nCancelled\nClosed",
+   "options": "\nDraft\nOn Hold\nTo Pick\nTo Pick and Bill\nTo Deliver and Bill\nTo Bill\nTo Deliver\nCompleted\nCancelled\nClosed",
    "print_hide": 1,
    "read_only": 1,
    "reqd": 1,
@@ -1229,6 +1230,12 @@
    "label": "Delivery End time"
   },
   {
+   "fieldname": "per_picked",
+   "fieldtype": "Percent",
+   "label": "% Picked",
+   "read_only": 1
+  },
+  {
    "allow_on_submit": 1,
    "collapsible": 1,
    "fieldname": "signature_section_section",
@@ -1245,7 +1252,7 @@
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2020-10-22 23:39:00.699855",
+ "modified": "2020-11-16 05:08:00.693654",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Sales Order",

@@ -74,6 +74,7 @@ class PaymentEntry(AccountsController):
 		self.update_expense_claim()
 		self.update_payment_schedule()
 		self.set_status()
+		self.check_reference_details()
 
 	def on_cancel(self):
 		self.setup_party_account_field()
@@ -347,6 +348,10 @@ class PaymentEntry(AccountsController):
 			self.status = 'Submitted'
 		else:
 			self.status = 'Draft'
+
+	def check_reference_details(self):
+		if self.mode_of_payment == "Check" and not (self.reference_no and self.reference_date):
+			frappe.throw(_("Please enter Reference No and Reference Date before submitting."))
 
 	def set_amounts(self):
 		self.set_amounts_in_company_currency()

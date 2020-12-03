@@ -20,6 +20,10 @@ def get_data():
 			{
 				'label': _('Quality'),
 				'items': ['Quality Inspection']
+			},
+			{
+				'label': _('Waste Disposal'),
+				'items': ['Waste Disposal']
 			}
 		]
 	}

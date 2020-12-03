@@ -131,6 +131,14 @@ frappe.query_reports["General Ledger"] = {
 			"options": erpnext.get_presentation_currency_list()
 		},
 		{
+			"fieldname":"against_voucher",
+			"label": __("Against Voucher"),
+			"fieldtype": "Data",
+			on_change: function() {
+				frappe.query_report.set_filter_value('group_by', "");
+			}
+		},
+		{
 			"fieldname":"cost_center",
 			"label": __("Cost Center"),
 			"fieldtype": "MultiSelectList",

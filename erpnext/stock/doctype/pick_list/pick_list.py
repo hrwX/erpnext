@@ -9,7 +9,7 @@ from six import iteritems
 from frappe.model.document import Document
 from frappe import _
 from collections import OrderedDict
-from frappe.utils import floor, flt, today, cint
+from frappe.utils import floor, flt, today, cint, unique
 from frappe.model.mapper import get_mapped_doc, map_child_doc
 from erpnext.stock.get_item_details import get_conversion_factor
 from erpnext.selling.doctype.sales_order.sales_order import make_delivery_note as create_delivery_note_from_sales_order
@@ -67,6 +67,9 @@ class PickList(Document):
 	def on_submit(self):
 		self.update_order_package_tag()
 		self.update_package_tag()
+
+	def on_update(self):
+		self.set_per_picked()
 
 	def on_cancel(self):
 		self.update_order_package_tag(reset=True)
@@ -169,6 +172,13 @@ class PickList(Document):
 			if not item.package_tag:
 				continue
 
+			if item.package_tag and item.coa_batch_no:
+				package_tag = frappe.get_doc("Package Tag", item.package_tag)
+				package_tag.update({
+					"coa_batch_no" : item.coa_batch_no
+				})
+				package_tag.save()
+
 			if item.sales_order_item:
 				package_tag = frappe.get_doc("Package Tag", item.package_tag)
 
@@ -192,6 +202,17 @@ class PickList(Document):
 					})
 					package_tag.save()
 
+	def set_per_picked(self):
+		"""
+		Set Percentage Picked(per_picked)in Sales Order on the basis of Pick List created.
+		"""
+		all_orders = [d.sales_order for d in self.locations]
+		for order in unique(all_orders):
+			picked_qty = sum(d.picked_qty for d in self.locations if d.sales_order == order)
+			ordered_qty = sum(d.qty for d in self.locations if d.sales_order == order)
+			per_picked = (picked_qty / ordered_qty) * 100
+
+			frappe.db.set_value("Sales Order", self.locations[0].sales_order, "per_picked", per_picked, update_modified=False)
 
 def validate_item_locations(pick_list):
 	if not pick_list.locations:
@@ -398,7 +419,7 @@ def create_delivery_note(source_name, target_doc=None):
 		coa_batch = None
 		if location.source_package_tag:
 			coa_batch = frappe.db.get_value("Package Tag", location.source_package_tag, "coa_batch_no")
-			
+
 		if dn_item:
 			dn_item.warehouse = location.warehouse
 			dn_item.qty = location.picked_qty

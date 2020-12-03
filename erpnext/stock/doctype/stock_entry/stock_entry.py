@@ -1383,6 +1383,7 @@ class StockEntry(StockController):
 					else:
 						coa_batch_no = frappe.db.get_value("Package Tag", source_item.package_tag, "coa_batch_no")
 						frappe.db.set_value("Package Tag", item.package_tag, "coa_batch_no", coa_batch_no)
+						item.update({"coa_batch_no" : coa_batch_no})
 
 
 @frappe.whitelist()

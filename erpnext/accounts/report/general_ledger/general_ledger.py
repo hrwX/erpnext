@@ -165,6 +165,9 @@ def get_conditions(filters):
 	if filters.get("voucher_no"):
 		conditions.append("voucher_no=%(voucher_no)s")
 
+	if filters.get("against_voucher"):
+		conditions.append("against_voucher=%(against_voucher)s")
+
 	if filters.get("group_by") == "Group by Party" and not filters.get("party_type"):
 		conditions.append("party_type in ('Customer', 'Supplier')")
 
@@ -314,7 +317,7 @@ def get_accountwise_gle(filters, gl_entries, gle_map):
 				gle_map[gle.get(group_by)].entries.append(gle)
 			elif filters.get("group_by") == _('Group by Voucher (Consolidated)'):
 				key = (gle.get("voucher_type"), gle.get("voucher_no"),
-					gle.get("account"), gle.get("cost_center"))
+					gle.get("account"), gle.get("cost_center"), gle.get("against_voucher"))
 				if key not in consolidated_gle:
 					consolidated_gle.setdefault(key, gle)
 				else:

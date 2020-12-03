@@ -277,7 +277,8 @@ class StockController(AccountsController):
 			"batch_no": cstr(d.get("batch_no")).strip(),
 			"serial_no": d.get("serial_no"),
 			"project": d.get("project") or self.get('project'),
-			"is_cancelled": self.docstatus==2 and "Yes" or "No"
+			"is_cancelled": self.docstatus==2 and "Yes" or "No",
+			"package_tag": cstr(d.get("package_tag"))
 		})
 
 		sl_dict.update(args)

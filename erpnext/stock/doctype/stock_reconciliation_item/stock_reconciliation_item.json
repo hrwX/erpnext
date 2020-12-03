@@ -17,6 +17,8 @@
   "serial_no",
   "column_break_11",
   "batch_no",
+  "package_tag",
+  "adjustment_reason",
   "section_break_3",
   "current_qty",
   "current_serial_no",
@@ -166,10 +168,21 @@
    "fieldtype": "Link",
    "label": "Batch No",
    "options": "Batch"
+  },
+  {
+   "fieldname": "package_tag",
+   "fieldtype": "Link",
+   "label": "Package tag",
+   "options": "Package Tag"
+  },
+  {
+   "fieldname": "adjustment_reason",
+   "fieldtype": "Data",
+   "label": "Adjustment Reason"
   }
  ],
  "istable": 1,
- "modified": "2019-06-14 17:10:53.188305",
+ "modified": "2020-10-28 23:24:08.914714",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Stock Reconciliation Item",

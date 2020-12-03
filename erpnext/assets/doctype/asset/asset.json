@@ -30,6 +30,7 @@
   "accounting_dimensions_section",
   "cost_center",
   "dimension_col_break",
+  "depreciation_expense_account",
   "section_break_5",
   "gross_purchase_amount",
   "available_for_use_date",
@@ -64,7 +65,6 @@
   "status",
   "booked_fixed_asset",
   "column_break_51",
-
   "purchase_receipt_amount",
   "default_finance_book",
   "amended_from"
@@ -441,7 +441,6 @@
    "read_only": 1
   },
   {
-   "collapsible": 1,
    "fieldname": "accounting_dimensions_section",
    "fieldtype": "Section Break",
    "label": "Accounting Dimensions"
@@ -456,12 +455,18 @@
    "fieldname": "allow_monthly_depreciation",
    "fieldtype": "Check",
    "label": "Allow Monthly Depreciation"
+  },
+  {
+   "fieldname": "depreciation_expense_account",
+   "fieldtype": "Link",
+   "label": "Depreciation Expense Account",
+   "options": "Account"
   }
  ],
  "idx": 72,
  "image_field": "image",
  "is_submittable": 1,
- "modified": "2019-10-22 15:47:36.050828",
+ "modified": "2020-11-20 03:09:08.185753",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset",

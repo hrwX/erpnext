@@ -383,7 +383,9 @@ def get_items_for_quality_inspection(doc, items):
 		inspection_type, fieldname = inspection_type_map.get(doc.get("doctype"))
 
 		quality_inspection_item = frappe.db.get_value("Item", item.get("item_code"), fieldname)
-		if quality_inspection_item:
+
+		# check it is quality inspection item and should not include same line item for QI.
+		if quality_inspection_item and not item.get("item_code") in [val['item_code'] for val in data]:
 			data.append({
 				"docname": item.get("name"),
 				"reference_type": item.get("parenttype"),

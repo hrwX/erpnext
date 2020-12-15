@@ -13,7 +13,8 @@ frappe.ui.form.on("Sales Order", {
 			'Purchase Order': 'Purchase Order',
 			'Project': 'Project',
 			'Payment Entry': "Payment",
-			'Work Order': "Work Order"
+			'Work Order': "Work Order",
+			'Production Plan': 'Production Plan',
 		}
 		frm.add_fetch('customer', 'tax_id', 'tax_id');
 
@@ -66,6 +67,12 @@ frappe.ui.form.on("Sales Order", {
 				})
 			});
 		}
+		frm.add_custom_button(__('Production Plan'), function() {
+			frappe.model.open_mapped_doc({
+				method: "erpnext.selling.doctype.sales_order.sales_order.make_production_plan",
+				frm: frm,
+			})
+		}, __('Create'));
 
 	},
 	onload: function(frm) {
@@ -105,6 +112,18 @@ frappe.ui.form.on("Sales Order Item", {
 		} else {
 			frm.script_manager.copy_from_first_row("items", row, ["delivery_date"]);
 		}
+		frappe.call({
+			method: "erpnext.selling.doctype.sales_order.sales_order.get_customer_item_ref_code",
+			args: {	
+				'item': frm.doc.items[0].item_code,
+				'customer_name': frm.doc.customer
+			},		
+			callback: function(r) {
+				if (r.message){				
+					frappe.model.set_value(cdt, cdn, "customer_item_code", r.message);				
+				}
+			}
+		});
 	},
 	delivery_date: function(frm, cdt, cdn) {
 		if(!frm.doc.delivery_date) {

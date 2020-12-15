@@ -86,8 +86,6 @@ frappe.ui.form.on('Pick List', {
 
 				if (frm.doc.purpose === 'Delivery') {
 					frm.add_custom_button(__('Delivery Note'), () => frm.trigger('create_delivery_note'), __('Create'));
-				} else {
-					frm.add_custom_button(__('Stock Entry'), () => frm.trigger('create_stock_entry'), __('Create'));
 				}
 			});
 		}
@@ -137,14 +135,6 @@ frappe.ui.form.on('Pick List', {
 			frm: frm
 		});
 
-	},
-	create_stock_entry: (frm) => {
-		frappe.xcall('erpnext.stock.doctype.pick_list.pick_list.create_stock_entry', {
-			'pick_list': frm.doc,
-		}).then(stock_entry => {
-			frappe.model.sync(stock_entry);
-			frappe.set_route("Form", 'Stock Entry', stock_entry.name);
-		});
 	},
 	update_pick_list_stock: (frm) => {
 		frm.events.set_item_locations(frm, true);

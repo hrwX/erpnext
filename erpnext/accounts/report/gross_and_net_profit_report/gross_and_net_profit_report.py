@@ -9,7 +9,7 @@ from erpnext.accounts.report.financial_statements import (get_period_list, get_c
 import copy
 
 def execute(filters=None):
-	period_list = get_period_list(filters.from_fiscal_year, filters.to_fiscal_year,
+	period_list = get_period_list(filters.from_date, filters.to_date,
 		filters.periodicity, filters.accumulated_values, filters.company)
 
 	columns, data = [], []

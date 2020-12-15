@@ -15,16 +15,23 @@ def execute(filters=None):
 		from erpnext.accounts.report.cash_flow.custom_cash_flow import execute as execute_custom
 		return execute_custom(filters=filters)
 
-	period_list = get_period_list(filters.from_fiscal_year, filters.to_fiscal_year,
+	period_list = get_period_list(filters.from_date, filters.to_date,
 		filters.periodicity, filters.accumulated_values, filters.company)
+
+	ignore_accumulated_values_for_fy = True
+	if filters.periodicity == "Custom":
+		ignore_accumulated_values_for_fy = False
 
 	cash_flow_accounts = get_cash_flow_accounts()
 
 	# compute net profit / loss
 	income = get_data(filters.company, "Income", "Credit", period_list, filters=filters,
-		accumulated_values=filters.accumulated_values, ignore_closing_entries=True, ignore_accumulated_values_for_fy= True)
+		accumulated_values=filters.accumulated_values, ignore_closing_entries=True,
+		ignore_accumulated_values_for_fy=ignore_accumulated_values_for_fy)
+
 	expense = get_data(filters.company, "Expense", "Debit", period_list, filters=filters,
-		accumulated_values=filters.accumulated_values, ignore_closing_entries=True, ignore_accumulated_values_for_fy= True)
+		accumulated_values=filters.accumulated_values, ignore_closing_entries=True,
+		ignore_accumulated_values_for_fy=ignore_accumulated_values_for_fy)
 
 	net_profit_loss = get_net_profit_loss(income, expense, period_list, filters.company)
 

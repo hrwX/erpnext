@@ -13,7 +13,7 @@ from frappe.utils import floor, flt, today, cint, unique
 from frappe.model.mapper import get_mapped_doc, map_child_doc
 from erpnext.stock.get_item_details import get_conversion_factor
 from erpnext.selling.doctype.sales_order.sales_order import make_delivery_note as create_delivery_note_from_sales_order
-
+from erpnext.compliance.doctype.package_tag.package_tag import get_package_tag_qty
 # TODO: Prioritize SO or WO group warehouse
 
 class PickList(Document):
@@ -64,9 +64,19 @@ class PickList(Document):
 					frappe.throw(_("Row #{0}: {1}'s quantity ({2}) should be less than or equal to the ordered quantity ({3})").format(
 						item.idx, frappe.bold(item.item_name), frappe.bold(item.qty), frappe.bold(ordered_item_qty)))
 
+				if item.source_package_tag:
+					package_tag_qty = get_package_tag_qty(item.source_package_tag)
+					if not package_tag_qty:
+						frappe.throw(_("Row #{0}: No record found for Package Tag {1} in Stock Ledger Entry ").format(
+							item.idx, frappe.bold(item.source_package_tag)))
+					if item.qty > package_tag_qty[0].qty:
+						frappe.throw(_("Row #{0}: {1}'s quantity ({2}) should not exceed Package Tag {3}'s quantity ({4})").format(
+							item.idx, frappe.bold(item.item_name), frappe.bold(item.qty), frappe.bold(item.source_package_tag), frappe.bold(package_tag_qty[0].qty)))
+
 	def on_submit(self):
 		self.update_order_package_tag()
 		self.update_package_tag()
+		self.create_stock_entry()
 
 	def on_update(self):
 		self.set_per_picked()
@@ -202,6 +212,9 @@ class PickList(Document):
 					})
 					package_tag.save()
 
+			if item.package_tag and frappe.db.exists("Package Tag", {"name": item.package_tag, "item_code": ""}):
+				frappe.db.set_value("Package Tag", item.package_tag, "item_code", item.item_code)
+
 	def set_per_picked(self):
 		"""
 		Set Percentage Picked(per_picked)in Sales Order on the basis of Pick List created.
@@ -213,6 +226,33 @@ class PickList(Document):
 			per_picked = (picked_qty / ordered_qty) * 100
 
 			frappe.db.set_value("Sales Order", self.locations[0].sales_order, "per_picked", per_picked, update_modified=False)
+
+	def create_stock_entry(self):
+		"""To create Stock Entry Repack Against Pick List Delivery !"""
+		validate_item_locations(self)
+		for location in self.locations:
+			if stock_entry_exists(self.get('name')):
+				return frappe.msgprint(_('Stock Entry has been already created against this Pick List'))
+			# Create New Document
+			stock_entry = frappe.new_doc('Stock Entry')
+			stock_entry.name = self.get('name')
+			if self.get('purpose') == "Delivery":
+				stock_entry.purpose = "Repack"
+			stock_entry.set_stock_entry_type()
+			if self.get('work_order'):
+				stock_entry = update_stock_entry_based_on_work_order(self, stock_entry)
+			elif self.get('material_request'):
+				stock_entry = update_stock_entry_based_on_material_request(self, stock_entry)
+			else:
+				if location.source_package_tag:
+					stock_entry = update_stock_entry_items_for_source(location, stock_entry)
+				if location.package_tag:
+					stock_entry = update_stock_entry_items_for_target(location, stock_entry)
+			stock_entry.set_incoming_rate()
+			stock_entry.set_actual_qty()
+			stock_entry.calculate_rate_and_amount(update_finished_item_rate=False)
+			stock_entry.save()
+			stock_entry.submit()
 
 def validate_item_locations(pick_list):
 	if not pick_list.locations:
@@ -437,32 +477,6 @@ def create_delivery_note(source_name, target_doc=None):
 	return delivery_note
 
 @frappe.whitelist()
-def create_stock_entry(pick_list):
-	pick_list = frappe.get_doc(json.loads(pick_list))
-	validate_item_locations(pick_list)
-
-	if stock_entry_exists(pick_list.get('name')):
-		return frappe.msgprint(_('Stock Entry has been already created against this Pick List'))
-
-	stock_entry = frappe.new_doc('Stock Entry')
-	stock_entry.pick_list = pick_list.get('name')
-	stock_entry.purpose = pick_list.get('purpose')
-	stock_entry.set_stock_entry_type()
-
-	if pick_list.get('work_order'):
-		stock_entry = update_stock_entry_based_on_work_order(pick_list, stock_entry)
-	elif pick_list.get('material_request'):
-		stock_entry = update_stock_entry_based_on_material_request(pick_list, stock_entry)
-	else:
-		stock_entry = update_stock_entry_items_with_no_reference(pick_list, stock_entry)
-
-	stock_entry.set_incoming_rate()
-	stock_entry.set_actual_qty()
-	stock_entry.calculate_rate_and_amount(update_finished_item_rate=False)
-
-	return stock_entry.as_dict()
-
-@frappe.whitelist()
 def get_pending_work_orders(doctype, txt, searchfield, start, page_length, filters, as_dict):
 	return frappe.db.sql("""
 		SELECT
@@ -580,18 +594,33 @@ def update_stock_entry_based_on_material_request(pick_list, stock_entry):
 
 	return stock_entry
 
-def update_stock_entry_items_with_no_reference(pick_list, stock_entry):
-	for location in pick_list.locations:
-		item = frappe._dict()
-		update_common_item_properties(item, location)
+def update_stock_entry_items_for_source(location, stock_entry):
+	"""Append Source Item Row in Stock Entry !"""
+	item = frappe._dict()
+	update_common_item_properties(item, location)
+	item.package_tag = location.source_package_tag
+	item.s_warehouse = location.warehouse
 
-		stock_entry.append('items', item)
-
+	stock_entry.append('items', item)
 	return stock_entry
+
+def update_stock_entry_items_for_target(location, stock_entry):
+	"""Append Target Item Row in Stock Entry !"""
+	item = frappe._dict()
+	update_common_item_properties(item, location)
+	item.package_tag = location.package_tag
+	# If Delivery Settings has Packing Warehouse set, then take that as Target warehouse
+	packing_warehouse = frappe.db.get_single_value("Delivery Settings", "packing_warehouse")
+	if packing_warehouse:
+		item.t_warehouse = packing_warehouse
+	else:
+		item.t_warehouse = location.warehouse
+	stock_entry.append('items', item)
+	return stock_entry
+
 
 def update_common_item_properties(item, location):
 	item.item_code = location.item_code
-	item.s_warehouse = location.warehouse
 	item.qty = location.picked_qty * location.conversion_factor
 	item.transfer_qty = location.picked_qty
 	item.uom = location.uom

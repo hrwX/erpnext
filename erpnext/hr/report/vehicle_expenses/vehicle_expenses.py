@@ -12,7 +12,7 @@ def execute(filters=None):
 	columns, data, chart = [], [], []
 	if filters.get('fiscal_year'):
 		company = erpnext.get_default_company()
-		period_list = get_period_list(filters.get('fiscal_year'), filters.get('fiscal_year'),"Monthly", company)
+		period_list = get_period_list(filters.get('from_date'), filters.get('to_date'),"Monthly", company)
 		columns=get_columns()
 		data=get_log_data(filters)
 		chart=get_chart_data(data,period_list)

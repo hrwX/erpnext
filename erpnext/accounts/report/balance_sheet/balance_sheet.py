@@ -8,7 +8,7 @@ from frappe.utils import flt, cint
 from erpnext.accounts.report.financial_statements import (get_period_list, get_columns, get_data)
 
 def execute(filters=None):
-	period_list = get_period_list(filters.from_fiscal_year, filters.to_fiscal_year,
+	period_list = get_period_list(filters.from_date, filters.to_date,
 		filters.periodicity, company=filters.company)
 
 	currency = filters.presentation_currency or frappe.get_cached_value('Company',  filters.company,  "default_currency")
@@ -63,6 +63,7 @@ def execute(filters=None):
 def get_provisional_profit_loss(asset, liability, equity, period_list, company, currency=None, consolidated=False):
 	provisional_profit_loss = {}
 	total_row = {}
+
 	if asset and (liability or equity):
 		total = total_row_total=0
 		currency = currency or frappe.get_cached_value('Company',  company,  "default_currency")

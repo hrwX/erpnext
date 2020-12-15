@@ -456,7 +456,7 @@ class Subscription(Document):
 
 		if invoice and getdate(self.current_invoice_start) <= getdate(invoice.posting_date) <= getdate(self.current_invoice_end):
 			return True
-		
+
 		return False
 
 	def process_for_active(self):
@@ -469,13 +469,16 @@ class Subscription(Document):
 		3. Change the `Subscription` status to 'Cancelled'
 		"""
 		if getdate() > getdate(self.current_invoice_end) and self.is_prepaid_to_invoice():
+			print("1")
 			self.update_subscription_period(add_days(self.current_invoice_end, 1))
 
 		if not self.is_current_invoice_generated() and (self.is_postpaid_to_invoice() or self.is_prepaid_to_invoice()):
+			print("2")
 			prorate = frappe.db.get_single_value('Subscription Settings', 'prorate')
 			self.generate_invoice(prorate)
 
 		if self.cancel_at_period_end and getdate() > getdate(self.current_invoice_end):
+			print("3")
 			self.cancel_subscription_at_period_end()
 
 	def cancel_subscription_at_period_end(self):

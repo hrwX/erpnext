@@ -48,7 +48,6 @@ frappe.ui.form.on(cur_frm.doctype, {
 			frm.get_docfield("taxes", "rate").reqd = 0;
 			frm.get_docfield("taxes", "tax_amount").reqd = 0;
 		}
-
 	},
 	taxes_on_form_rendered: function(frm) {
 		erpnext.taxes.set_conditional_mandatory_rate_or_amount(frm.open_grid_row());
@@ -57,14 +56,24 @@ frappe.ui.form.on(cur_frm.doctype, {
 
 	allocate_advances_automatically: function(frm) {
 		if(frm.doc.allocate_advances_automatically) {
-			frappe.call({
-				doc: frm.doc,
-				method: "set_advances",
-				callback: function(r, rt) {
-					refresh_field("advances");
-				}
-			})
+			frm.trigger("set_advances");
 		}
+	},
+
+	allocate_advances_based_on_quantities: function(frm) {
+		if(frm.doc.allocate_advances_based_on_quantities) {
+			frm.trigger("set_advances");
+		}
+	},
+
+	set_advances: function(frm) {
+		frappe.call({
+			doc: frm.doc,
+			method: "set_advances",
+			callback: function(r, rt) {
+				refresh_field("advances");
+			}
+		});
 	}
 });
 

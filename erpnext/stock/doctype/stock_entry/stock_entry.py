@@ -98,7 +98,7 @@ class StockEntry(StockController):
 		self.update_quality_inspection()
 		if self.work_order and self.purpose == "Manufacture":
 			self.update_so_in_serial_number()
-		self.update_coa_batch_no()
+		self.update_package_tag()
 
 	def on_cancel(self):
 
@@ -1368,7 +1368,7 @@ class StockEntry(StockController):
 						'reference_name': reference_name
 					})
 
-	def update_coa_batch_no(self):
+	def update_package_tag(self):
 		stock_entry_purpose = frappe.db.get_value("Stock Entry Type", self.stock_entry_type, "purpose")
 		if stock_entry_purpose == "Material Receipt":
 			for item in self.items:
@@ -1385,6 +1385,8 @@ class StockEntry(StockController):
 						frappe.db.set_value("Package Tag", item.package_tag, "coa_batch_no", coa_batch_no)
 						item.update({"coa_batch_no" : coa_batch_no})
 
+					if frappe.db.exists("Package Tag", {"name": item.package_tag, "item_code": ""}):
+						frappe.db.set_value("Package Tag", item.package_tag, "item_code", item.item_code)
 
 @frappe.whitelist()
 def move_sample_to_retention_warehouse(company, items):

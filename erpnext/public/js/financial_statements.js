@@ -12,10 +12,8 @@ erpnext.financial_statements = {
 		}
 
 		value = default_formatter(value, row, column, data);
-
 		if (!data.parent_account) {
 			value = $(`<span>${value}</span>`);
-
 			var $value = $(value).css("font-weight", "bold");
 			if (data.warn_if_negative && data[column.fieldname] < 0) {
 				$value.addClass("text-danger");
@@ -65,7 +63,7 @@ erpnext.financial_statements = {
 function get_filters() {
 	let filters = [
 		{
-			"fieldname":"company",
+			"fieldname": "company",
 			"label": __("Company"),
 			"fieldtype": "Link",
 			"options": "Company",
@@ -73,25 +71,23 @@ function get_filters() {
 			"reqd": 1
 		},
 		{
-			"fieldname":"finance_book",
+			"fieldname": "finance_book",
 			"label": __("Finance Book"),
 			"fieldtype": "Link",
 			"options": "Finance Book"
 		},
 		{
-			"fieldname":"from_fiscal_year",
-			"label": __("Start Year"),
-			"fieldtype": "Link",
-			"options": "Fiscal Year",
-			"default": frappe.defaults.get_user_default("fiscal_year"),
+			"fieldname": "from_date",
+			"label": __("From Date"),
+			"fieldtype": "Date",
+			"default": frappe.defaults.get_user_default("year_start_date"),
 			"reqd": 1
 		},
 		{
-			"fieldname":"to_fiscal_year",
-			"label": __("End Year"),
-			"fieldtype": "Link",
-			"options": "Fiscal Year",
-			"default": frappe.defaults.get_user_default("fiscal_year"),
+			"fieldname": "to_date",
+			"label": __("To Date"),
+			"fieldtype": "Date",
+			"default": frappe.defaults.get_user_default("year_end_date"),
 			"reqd": 1
 		},
 		{
@@ -99,6 +95,7 @@ function get_filters() {
 			"label": __("Periodicity"),
 			"fieldtype": "Select",
 			"options": [
+				{ "value": "Custom", "label": __("Custom Date Range") },
 				{ "value": "Monthly", "label": __("Monthly") },
 				{ "value": "Quarterly", "label": __("Quarterly") },
 				{ "value": "Half-Yearly", "label": __("Half-Yearly") },

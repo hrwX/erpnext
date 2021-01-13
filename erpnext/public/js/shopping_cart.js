@@ -122,11 +122,7 @@ $.extend(shopping_cart, {
 			$(".cart-addresses").hide();
 		}
 
-		if (cart_count) {
-			$badge.html(cart_count);
-		} else {
-			$badge.remove();
-		}
+		$badge.html(cart_count);
 	},
 
 	shopping_cart_update: function({item_code, qty, row, cart_dropdown, additional_notes}) {

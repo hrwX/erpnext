@@ -9,53 +9,10 @@ frappe.ui.form.on("Work Order", {
 			'Job Card': 'Create Job Card'
 		};
 
-		// Set query for warehouses
-		frm.set_query("wip_warehouse", function() {
-			return {
-				filters: {
-					'company': frm.doc.company,
-				}
-			};
-		});
-
-		frm.set_query("source_warehouse", function() {
-			return {
-				filters: {
-					'company': frm.doc.company,
-				}
-			};
-		});
-
-		frm.set_query("source_warehouse", "required_items", function() {
-			return {
-				filters: {
-					'company': frm.doc.company,
-				}
-			};
-		});
-
 		frm.set_query("sales_order", function() {
 			return {
 				filters: {
 					"status": ["not in", ["Closed", "On Hold"]]
-				}
-			};
-		});
-
-		frm.set_query("fg_warehouse", function() {
-			return {
-				filters: {
-					'company': frm.doc.company,
-					'is_group': 0
-				}
-			};
-		});
-
-		frm.set_query("scrap_warehouse", function() {
-			return {
-				filters: {
-					'company': frm.doc.company,
-					'is_group': 0
 				}
 			};
 		});
@@ -105,6 +62,10 @@ frappe.ui.form.on("Work Order", {
 		// formatter for work order operation
 		frm.set_indicator_formatter('operation',
 			function(doc) { return (frm.doc.qty==doc.completed_qty) ? "green" : "orange"; });
+
+		erpnext.queries.setup_queries(frm, "Warehouse", function() {
+			return erpnext.queries.warehouse(frm.doc);
+		});
 	},
 
 	onload: function(frm) {
@@ -118,7 +79,6 @@ frappe.ui.form.on("Work Order", {
 				"actual_start_date": "",
 				"actual_end_date": ""
 			});
-			erpnext.work_order.set_default_warehouse(frm);
 		}
 	},
 

@@ -1,5 +1,5 @@
 {
- "actions": [],
+ "allow_guest_to_view": 1,
  "allow_import": 1,
  "allow_rename": 1,
  "creation": "2013-03-07 18:50:32",
@@ -11,11 +11,17 @@
   "warehouse_detail",
   "warehouse_name",
   "is_group",
+  "published",
+  "route",
   "company",
   "disabled",
   "column_break_4",
   "account",
   "warehouse_type",
+  "warehouse_party_details",
+  "customer",
+  "column_break_13",
+  "supplier",
   "address_and_contact",
   "address_html",
   "column_break_10",
@@ -224,13 +230,47 @@
    "fieldtype": "Link",
    "label": "Warehouse Type",
    "options": "Warehouse Type"
+  },
+  {
+   "default": "0",
+   "fieldname": "published",
+   "fieldtype": "Check",
+   "label": "Published"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "label": "Route",
+   "read_only": 1
+  },
+  {
+   "fieldname": "warehouse_party_details",
+   "fieldtype": "Section Break",
+   "label": "Warehouse Party Details"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
   }
  ],
+ "has_web_view": 1,
  "icon": "fa fa-building",
  "idx": 1,
+ "is_published_field": "published",
  "is_tree": 1,
- "links": [],
- "modified": "2020-03-18 18:26:00.479541",
+ "modified": "2020-12-16 01:24:14.410271",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Warehouse",
@@ -284,6 +324,7 @@
    "role": "Manufacturing User"
   }
  ],
+ "route": "warehouse",
  "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

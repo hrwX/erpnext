@@ -100,6 +100,7 @@
   "loyalty_redemption_account",
   "loyalty_redemption_cost_center",
   "section_break_49",
+  "coupon_code",
   "apply_discount_on",
   "base_discount_amount",
   "column_break_51",
@@ -244,7 +245,7 @@
    "fieldname": "tax_id",
    "fieldtype": "Data",
    "label": "Tax Id",
-   "print_hide": 1,
+   "print_hide": 0,
    "read_only": 1
   },
   {
@@ -340,7 +341,8 @@
    "fieldname": "set_posting_time",
    "fieldtype": "Check",
    "label": "Edit Posting Date and Time",
-   "print_hide": 1
+   "print_hide": 1,
+   "allow_on_submit": 1
   },
   {
    "fieldname": "due_date",
@@ -348,7 +350,8 @@
    "label": "Payment Due Date",
    "no_copy": 1,
    "oldfieldname": "due_date",
-   "oldfieldtype": "Date"
+   "oldfieldtype": "Date",
+   "allow_on_submit": 1
   },
   {
    "fieldname": "amended_from",
@@ -1595,13 +1598,19 @@
    "fieldname": "allocate_advances_based_on_quantities",
    "fieldtype": "Check",
    "label": "Allocate Advances Based on Quantities"
+  },
+  {
+   "fieldname": "coupon_code",
+   "fieldtype": "Link",
+   "label": "Coupon Code",
+   "options": "Coupon Code"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 181,
  "is_submittable": 1,
- "modified": "2020-12-13 22:43:56.201272",
- "modified_by": "Administrator",
+ "modified": "2021-01-14 19:12:42.440076",
+ "modified_by": "forellana@digithinkit.com",
  "module": "Accounts",
  "name": "Sales Invoice",
  "name_case": "Title Case",
@@ -1646,7 +1655,7 @@
   }
  ],
  "quick_entry": 1,
- "search_fields": "posting_date, due_date, customer, base_grand_total, outstanding_amount",
+ "search_fields": "posting_date, due_date, base_grand_total, outstanding_amount",
  "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

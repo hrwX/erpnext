@@ -21,7 +21,11 @@ frappe.ui.form.on('Pricing Rule', {
 					filters: {'value': row[frappe.scrub(doc.apply_on)], apply_on: doc.apply_on}
 				}
 			};
-		})
+		});
+
+		erpnext.queries.setup_queries(frm, "Warehouse", function() {
+			return erpnext.queries.warehouse(frm.doc);
+		});
 	},
 
 	onload: function(frm) {

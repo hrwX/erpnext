@@ -198,7 +198,7 @@ erpnext.SerialNoBatchSelector = Class.extend({
 			});
 			return true;
 
-		} else {
+		} else if(this.has_serial_no) {
 			let serial_nos = values.serial_no || '';
 			if (!serial_nos || !serial_nos.replace(/\s/g, '').length) {
 				frappe.throw(__("Please enter serial numbers for serialized item "
@@ -207,6 +207,7 @@ erpnext.SerialNoBatchSelector = Class.extend({
 			}
 			return true;
 		}
+		return true;
 	},
 
 	update_batch_items() {

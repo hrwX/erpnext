@@ -6,6 +6,9 @@ frappe.ui.form.on('Job Card', {
 		frm.custom_make_buttons = {
 			'Quality Inspection': 'Quality Inspection'
 		}
+		erpnext.queries.setup_queries(frm, "Warehouse", function() {
+			return erpnext.queries.warehouse(frm.doc);
+		});
 	},
 
 	refresh: function(frm) {

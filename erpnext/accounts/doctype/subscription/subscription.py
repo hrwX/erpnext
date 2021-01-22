@@ -263,7 +263,7 @@ class Subscription(Document):
 		end_date = add_to_date(self.start_date, **billing_cycle_info)
 
 		if self.end_date and getdate(self.end_date) <= getdate(end_date):
-			frappe.throw(_('Subscription End Date must be after {0} as per the subscription plan').format(frappe.utils.formatdate(end_date, "mm-dd-yyyy")))
+			frappe.throw(_('Subscription End Date must be after {0} as per the subscription plan').format(frappe.utils.formatdate(end_date)))
 
 	def validate_to_follow_calendar_months(self):
 		if self.follow_calendar_months:
@@ -345,13 +345,14 @@ class Subscription(Document):
 			invoice.set_taxes()
 
 		# Due date
-		invoice.append(
-			'payment_schedule',
-			{
-				'due_date': add_days(invoice.posting_date, cint(self.days_until_due)),
-				'invoice_portion': 100
-			}
-		)
+		if self.days_until_due:
+			invoice.append(
+				'payment_schedule',
+				{
+					'due_date': add_days(invoice.posting_date, cint(self.days_until_due)),
+					'invoice_portion': 100
+				}
+			)
 
 		# Discounts
 		if self.additional_discount_percentage:
@@ -503,7 +504,7 @@ class Subscription(Document):
 		"""
 		current_invoice = self.get_current_invoice()
 		if not current_invoice:
-			frappe.throw(_('Current invoice {0} is missing'.format(current_invoice.invoice)))
+			frappe.throw(_('Current invoice {0} is missing').format(current_invoice.invoice))
 		else:
 			if not self.has_outstanding_invoice():
 				self.status = 'Active'

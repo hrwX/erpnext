@@ -4,6 +4,12 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Waste Disposal", {
+	setup: function(frm) {
+		erpnext.queries.setup_queries(frm, "Warehouse", function() {
+			return erpnext.queries.warehouse(frm.doc);
+		});
+	},
+
 	refresh: function(frm) {
 		// Add button to retrieve items for disposal
 		if (frm.doc.docstatus < 1) {
@@ -11,9 +17,6 @@ frappe.ui.form.on("Waste Disposal", {
 				frm.events.get_items(frm);
 			});
 		}
-
-		// Setup link queries for fields
-		erpnext.queries.setup_warehouse_query(frm);
 
 		frm.fields_dict.items.grid.get_field("item_code").get_query = function () {
 			return erpnext.queries.item({ is_stock_item: 1 });

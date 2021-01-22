@@ -7,8 +7,8 @@ import unittest
 
 import frappe
 from erpnext.accounts.doctype.subscription.subscription import get_prorata_factor
-from frappe.utils.data import nowdate, add_days, add_to_date, add_months, date_diff, flt, get_date_str
-
+from frappe.utils.data import (nowdate, add_days, add_to_date, add_months, date_diff, flt, get_date_str,
+	get_first_day, get_last_day)
 
 def create_plan():
 	if not frappe.db.exists('Subscription Plan', '_Test Plan Name'):
@@ -237,21 +237,21 @@ class TestSubscription(unittest.TestCase):
 		subscription.party_type = 'Customer'
 		subscription.party = '_Test Customer'
 		subscription.append('plans', {'plan': '_Test Plan Name', 'qty': 1})
-		subscription.start_date = '2018-01-01'
+		subscription.start_date = add_days(nowdate(), -1000)
 		subscription.insert()
-		subscription.process()		# generate first invoice
+		subscription.process() # generate first invoice
 
-		self.assertEqual(subscription.status, 'Unpaid')
+		self.assertEqual(subscription.status, 'Past Due Date')
 
 		subscription.process()
 		# Grace period is 1000 days so status should remain as Past Due Date
-		self.assertEqual(subscription.status, 'Unpaid')
+		self.assertEqual(subscription.status, 'Past Due Date')
 
 		subscription.process()
-		self.assertEqual(subscription.status, 'Unpaid')
+		self.assertEqual(subscription.status, 'Past Due Date')
 
 		subscription.process()
-		self.assertEqual(subscription.status, 'Unpaid')
+		self.assertEqual(subscription.status, 'Past Due Date')
 
 		settings.grace_period = grace_period
 		settings.save()

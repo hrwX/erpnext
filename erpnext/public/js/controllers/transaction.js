@@ -203,11 +203,12 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 				}
 			});
 		}
-
+		erpnext.queries.setup_queries(me.frm, "Warehouse", function() {
+			return erpnext.queries.warehouse(me.frm.doc);
+		});
 	},
 	onload: function() {
 		var me = this;
-
 		if(this.frm.doc.__islocal) {
 			var currency = frappe.defaults.get_user_default("currency");
 

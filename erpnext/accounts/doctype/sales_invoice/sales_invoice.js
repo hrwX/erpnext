@@ -22,10 +22,6 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 			this.frm.set_df_property("debit_to", "print_hide", 0);
 		}
 
-		erpnext.queries.setup_queries(this.frm, "Warehouse", function() {
-			return erpnext.queries.warehouse(me.frm.doc);
-		});
-
 		if(this.frm.doc.__islocal && this.frm.doc.is_pos) {
 			//Load pos profile data on the invoice if the default value of Is POS is 1
 

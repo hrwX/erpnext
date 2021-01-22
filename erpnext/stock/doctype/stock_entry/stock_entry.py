@@ -22,7 +22,7 @@ from erpnext.stock.stock_ledger import NegativeStockError, get_previous_sle, get
 from erpnext.stock.utils import get_bin, get_incoming_rate
 from frappe import _
 from frappe.model.mapper import get_mapped_doc
-from frappe.utils import (cint, comma_or, cstr, flt, format_time, formatdate, getdate, nowdate)
+from frappe.utils import (cint, comma_or, cstr, flt, format_time, formatdate, getdate, nowdate, today, get_date_str, add_days)
 
 
 class IncorrectValuationRateError(frappe.ValidationError): pass
@@ -555,7 +555,7 @@ class StockEntry(StockController):
 	def set_stock_entry_type(self):
 		if self.purpose:
 			self.stock_entry_type = frappe.get_cached_value('Stock Entry Type',
-				{'purpose': self.purpose}, 'name')
+				{'purpose': self.purpose}, 'purpose')
 
 	def set_purpose_for_stock_entry(self):
 		if self.stock_entry_type and not self.purpose:
@@ -1601,3 +1601,54 @@ def validate_sample_quantity(item_code, sample_quantity, qty, batch_no = None):
 			format(max_retain_qty, batch_no, item_code), alert=True)
 		sample_quantity = qty_diff
 	return sample_quantity
+
+def raw_material_update_on_bom():
+	"""
+	Calculates Average Manufactured Qty(avg_manufactured_qty) for BOM on the Basis of Stock Entries created and
+	it fetches the Stock Entries created within specified number of days in Stock Settings if not
+	specified then it calculates for past seven days against BOM.
+	"""
+	no_of_days_to_calculate_avg_manufactured_qty = frappe.db.get_single_value("Stock Settings", "no_of_days_to_calculate_avg_manufactured_qty") or -7
+	no_of_days = get_date_str(add_days(today(), no_of_days_to_calculate_avg_manufactured_qty))
+	bom_count = {}
+
+	stock_entries = frappe.db.sql("""
+		SELECT
+			stock_entry.name, stock_entry.bom_no
+		FROM
+			`tabStock Entry` AS stock_entry
+		LEFT JOIN
+			`tabBOM` as bom
+				ON stock_entry.bom_no = bom.name
+		WHERE
+			bom.manufacturing_type = "Process"
+			and stock_entry.posting_date between date(%s) and date(%s)
+		GROUP BY
+			stock_entry.bom_no
+	""",(no_of_days, today()), as_dict=1)
+
+	for stock_entry in stock_entries:
+		stock_entry_items = frappe.db.sql("""
+			SELECT
+				sed.s_warehouse, sed.t_warehouse, sed.qty
+			FROM
+				`tabStock Entry Detail` AS sed
+			WHERE
+				sed.parent = (%s)
+		""",(stock_entry.name), as_dict=1)
+
+		if stock_entry.bom_no not in bom_count:
+			bom_count.setdefault(stock_entry.bom_no, {
+				'raw_material': 0,
+				'finished_good': 0
+			})
+		for item in stock_entry_items:
+			if item.s_warehouse:
+				bom_count[stock_entry.bom_no]['raw_material'] += item.qty
+			if item.t_warehouse:
+				bom_count[stock_entry.bom_no]['finished_good'] += item.qty
+
+	for bom, value in bom_count.items():
+		if value.get("raw_material") and value.get("finished_good"):
+			avg_manufactured_qty = value.get("finished_good") / value.get("raw_material")
+			frappe.db.set_value("BOM", bom, "avg_manufactured_qty", avg_manufactured_qty)

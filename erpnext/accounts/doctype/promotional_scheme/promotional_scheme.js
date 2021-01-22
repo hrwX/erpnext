@@ -2,11 +2,15 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Promotional Scheme', {
+	setup: function(frm) {
+		erpnext.queries.setup_queries(frm, "Warehouse", function() {
+			return erpnext.queries.warehouse(frm.doc);
+		});
+	},
 	refresh: function(frm) {
 		frm.trigger("set_options_for_applicable_for");
 		frm.trigger("toggle_reqd_apply_on");
 	},
-
 	selling: function(frm) {
 		frm.trigger("set_options_for_applicable_for");
 	},

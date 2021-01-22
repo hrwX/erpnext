@@ -8,20 +8,8 @@ frappe.ui.form.on('Production Plan', {
 			'Material Request': 'Material Request',
 		};
 
-		frm.fields_dict['po_items'].grid.get_field('warehouse').get_query = function(doc) {
-			return {
-				filters: {
-					company: doc.company
-				}
-			}
-		}
-
-		frm.set_query('for_warehouse', function(doc) {
-			return {
-				filters: {
-					company: doc.company
-				}
-			}
+		erpnext.queries.setup_queries(frm, "Warehouse", function() {
+			return erpnext.queries.warehouse(frm.doc);
 		});
 
 		frm.fields_dict['po_items'].grid.get_field('item_code').get_query = function(doc) {
@@ -42,14 +30,10 @@ frappe.ui.form.on('Production Plan', {
 				}
 			} else frappe.msgprint(__("Please enter Item first"));
 		}
+	},
 
-		frm.fields_dict['mr_items'].grid.get_field('warehouse').get_query = function(doc) {
-			return {
-				filters: {
-					company: doc.company
-				}
-			}
-		}
+	on_submit: function(frm) {
+		frm.fields_dict.po_items.grid.toggle_reqd("bom_no", true)
 	},
 
 	refresh: function(frm) {

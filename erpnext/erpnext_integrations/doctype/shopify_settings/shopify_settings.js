@@ -40,14 +40,9 @@ frappe.ui.form.on("Shopify Settings", "refresh", function(frm){
 
 $.extend(erpnext_integrations.shopify_settings, {
 	setup_queries: function(frm) {
-		frm.fields_dict["warehouse"].get_query = function(doc) {
-			return {
-				filters:{
-					"company": doc.company,
-					"is_group": "No"
-				}
-			}
-		}
+		erpnext.queries.setup_queries(frm, "Warehouse", function() {
+			return erpnext.queries.warehouse(frm.doc);
+		});
 
 		frm.fields_dict["taxes"].grid.get_field("tax_account").get_query = function(doc){
 			return {

@@ -5,6 +5,7 @@
  "document_type": "Setup",
  "engine": "InnoDB",
  "field_order": [
+  "title",
   "item",
   "company",
   "item_name",
@@ -17,6 +18,7 @@
   "set_rate_of_sub_assembly_item_based_on_bom",
   "project",
   "quantity",
+  "avg_manufactured_qty",
   "image",
   "currency_detail",
   "currency",
@@ -273,6 +275,7 @@
    "label": "Scrap"
   },
   {
+   "description": "Scrap calculation for 1 (Unit/Gram/Nos) is (Qty = BOM qty / percentage of loss)",
    "fieldname": "scrap_items",
    "fieldtype": "Table",
    "label": "Scrap Items",
@@ -506,13 +509,29 @@
    "label": "Manufacturing Type",
    "options": "\nDiscrete\nProcess",
    "reqd": 1
+  },
+  {
+   "fieldname": "avg_manufactured_qty",
+   "fieldtype": "Float",
+   "label": "Average Manufactured Quantity",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "{item_name}",
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "no_copy": 1,
+   "print_hide": 1
   }
  ],
  "icon": "fa fa-sitemap",
  "idx": 1,
  "image_field": "image",
  "is_submittable": 1,
- "modified": "2020-10-22 04:48:01.576040",
+ "modified": "2021-01-08 03:02:32.714648",
  "modified_by": "Administrator",
  "module": "Manufacturing",
  "name": "BOM",
@@ -551,5 +570,6 @@
  "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "title_field": "title",
  "track_changes": 1
 }

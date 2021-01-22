@@ -280,7 +280,7 @@
    "fieldtype": "Select",
    "label": "Status",
    "no_copy": 1,
-   "options": "\nDraft\nSubmitted\nNot Started\nIn Process\nCompleted\nStopped\nCancelled\nMaterial Requested\nMaterial Received",
+   "options": "\nDraft\nSubmitted\nNot Started\nIn Process\nCompleted\nStopped\nCancelled\nMaterial Requested\nPartially Received\nMaterial Received",
    "print_hide": 1,
    "read_only": 1
   },
@@ -302,7 +302,7 @@
  ],
  "icon": "fa fa-calendar",
  "is_submittable": 1,
- "modified": "2020-12-07 03:58:16.048132",
+ "modified": "2020-12-09 11:56:54.985557",
  "modified_by": "Administrator",
  "module": "Manufacturing",
  "name": "Production Plan",

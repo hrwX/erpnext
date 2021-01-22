@@ -471,7 +471,7 @@ class AccountsController(TransactionBase):
 	def set_advances(self):
 		"""Returns list of advances against Account, Party, Reference"""
 
-		if self.allocate_advances_based_on_quantities:
+		if self.doctype == "Sales Invoice" and self.allocate_advances_based_on_quantities:
 			res = self.get_advance_entries(include_unallocated=False)
 		else:
 			res = self.get_advance_entries()
@@ -480,7 +480,7 @@ class AccountsController(TransactionBase):
 		advance_allocated = 0
 		for d in res:
 			if d.against_order:
-				if self.allocate_advances_based_on_quantities:
+				if self.doctype == "Sales Invoice" and self.allocate_advances_based_on_quantities:
 					# formula for calculating allocated amount = (Fullfilled qty / Order Qty) * original_advance_paid_amount
 					order_qty = frappe.db.get_value("Sales Order", filters={"name":d.against_order}, fieldname=["total_qty"])
 					allocated_amount = flt(self.total_qty / order_qty) * d.total_allocated_amount

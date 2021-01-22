@@ -18,7 +18,11 @@
   "min_order_qty",
   "section_break_8",
   "sales_order",
-  "requested_qty"
+  "requested_qty",
+  "stock_qty",
+  "received_qty",
+  "per_received",
+  "produced_qty"
  ],
  "fields": [
   {
@@ -119,10 +123,31 @@
    "label": "UOM",
    "options": "UOM",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "per_received",
+   "fieldtype": "Percent",
+   "label": "Per Received"
+  },
+  {
+   "fieldname": "received_qty",
+   "fieldtype": "Float",
+   "label": "Received Qty"
+  },
+  {
+   "fieldname": "stock_qty",
+   "fieldtype": "Float",
+   "label": "Stock Qty"
+  },
+  {
+   "fieldname": "produced_qty",
+   "fieldtype": "Float",
+   "label": "Produced Qty"
   }
  ],
  "istable": 1,
- "modified": "2019-11-08 15:15:43.979360",
+ "modified": "2021-01-04 00:32:03.534497",
  "modified_by": "Administrator",
  "module": "Manufacturing",
  "name": "Material Request Plan Item",

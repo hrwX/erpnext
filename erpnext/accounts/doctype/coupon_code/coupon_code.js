@@ -1,15 +1,9 @@
 // Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
-
 frappe.ui.form.on('Coupon Code', {
 	setup: function(frm) {
-		frm.set_query("pricing_rule", function() {
-			return {
-				filters: [
-					["Pricing Rule","coupon_code_based", "=", "1"]
-				]
-			};
-		});
+		const $container = $(frm.page.current_view).find('[data-fieldname=brackets_widget]');
+		$container.data("brackets_widget", new erpnext.bloombrackets.Component($container, frm, "brackets_code"));
 	},
 	coupon_name:function(frm){
 		if (frm.doc.__islocal===1) {
@@ -35,10 +29,7 @@ frappe.ui.form.on('Coupon Code', {
 		frm.refresh_field('coupon_code');
 	},
 	refresh: function(frm) {
-		if (frm.doc.pricing_rule) {
-			frm.add_custom_button(__("Add/Edit Coupon Conditions"), function(){
-				frappe.set_route("Form", "Pricing Rule", frm.doc.pricing_rule);
-			});
-		}
+		const $container = $(frm.page.current_view).find('[data-fieldname=brackets_widget]');
 	}
 });
+

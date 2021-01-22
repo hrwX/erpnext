@@ -65,6 +65,7 @@
   "material_request_item",
   "production_plan",
   "production_plan_item",
+  "material_request_plan_item",
   "sales_order",
   "sales_order_item",
   "supplier_quotation",
@@ -734,11 +735,16 @@
    "fieldname": "production_plan_item",
    "fieldtype": "Data",
    "label": "Production Plan Item"
+  },
+  {
+   "fieldname": "material_request_plan_item",
+   "fieldtype": "Data",
+   "label": "Material Request Plan Item"
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2020-12-05 02:13:11.251503",
+ "modified": "2020-12-09 03:10:41.856034",
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Purchase Order Item",

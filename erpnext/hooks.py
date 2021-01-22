@@ -17,7 +17,10 @@ develop_version = '12.x.x-develop'
 
 app_include_js = "assets/js/erpnext.min.js"
 app_include_css = "assets/css/erpnext.css"
-web_include_js = "assets/js/erpnext-web.min.js"
+web_include_js = [
+	"assets/js/erpnext-web.min.js", 
+	"assets/js/order_for.js"
+]
 web_include_css = "assets/css/erpnext-web.css"
 
 doctype_js = {
@@ -49,12 +52,18 @@ on_session_creation = [
 	"erpnext.portal.utils.create_customer_or_supplier",
 	"erpnext.shopping_cart.utils.set_cart_count"
 ]
+
+on_session_start = "erpnext.selling.utils.initialise_order_for"
+
 on_logout = "erpnext.shopping_cart.utils.clear_cart_count"
 
 treeviews = ['Account', 'Cost Center', 'Warehouse', 'Item Group', 'Customer Group', 'Sales Person', 'Territory', 'Assessment Group', 'Department']
 
 # website
-update_website_context = ["erpnext.shopping_cart.utils.update_website_context", "erpnext.education.doctype.education_settings.education_settings.update_website_context"]
+update_website_context = [
+	"erpnext.shopping_cart.utils.update_website_context", 
+	"erpnext.education.doctype.education_settings.education_settings.update_website_context"
+]
 my_account_context = "erpnext.shopping_cart.utils.update_my_account_context"
 
 email_append_to = ["Job Applicant", "Lead", "Opportunity", "Issue"]
@@ -173,6 +182,7 @@ standard_portal_menu_items = [
 	{"title": _("Shipments"), "route": "/shipments", "reference_doctype": "Delivery Note", "role":"Customer"},
 	{"title": _("Issues"), "route": "/issues", "reference_doctype": "Issue", "role":"Customer"},
 	{"title": _("Addresses"), "route": "/addresses", "reference_doctype": "Address"},
+	{"title": _("Warehouse"), "route": "/warehouse", "reference_doctype": "Warehouse"},
 	{"title": _("Timesheets"), "route": "/timesheets", "reference_doctype": "Timesheet", "role":"Customer"},
 	{"title": _("Lab Test"), "route": "/lab-test", "reference_doctype": "Lab Test", "role":"Patient"},
 	{"title": _("Prescription"), "route": "/prescription", "reference_doctype": "Patient Encounter", "role":"Patient"},
@@ -318,7 +328,8 @@ scheduler_events = {
 		"erpnext.support.doctype.service_level_agreement.service_level_agreement.check_agreement_status",
 		"erpnext.crm.doctype.email_campaign.email_campaign.send_email_to_leads_or_contacts",
 		"erpnext.crm.doctype.email_campaign.email_campaign.set_email_campaign_status",
-		"erpnext.selling.doctype.quotation.quotation.set_expired_status"
+		"erpnext.selling.doctype.quotation.quotation.set_expired_status",
+		"erpnext.stock.doctype.stock_entry.stock_entry.raw_material_update_on_bom"
 	],
 	"daily_long": [
 		"erpnext.setup.doctype.email_digest.email_digest.send",
@@ -554,3 +565,18 @@ global_search_doctypes = {
 		{'doctype': 'Hotel Room Type', 'index': 4}
 	]
 }
+
+# Coupon code brackets context building
+coupon_brackets_extend_commands = [
+	"erpnext.bloombrackets.coupon_commands.item_query.load_commands",
+	"erpnext.bloombrackets.coupon_commands.quotation_discounts.load_commands",
+	"erpnext.bloombrackets.coupon_commands.tax_charges.load_commands",
+]
+coupon_brackets_extend_meta = [
+	"erpnext.bloombrackets.coupon_commands.item_query.load_commands_meta",
+	"erpnext.bloombrackets.coupon_commands.quotation_discounts.load_commands_meta",
+	"erpnext.bloombrackets.coupon_commands.tax_charges.load_commands_meta",
+]
+coupon_brackets_extend_vars_meta = [
+	"erpnext.bloombrackets.coupon_commands.variables.load_variable_meta"
+]

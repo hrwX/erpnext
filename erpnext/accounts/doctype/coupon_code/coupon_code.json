@@ -12,15 +12,19 @@
   "customer",
   "column_break_4",
   "coupon_code",
-  "pricing_rule",
   "uses",
   "valid_from",
   "valid_upto",
   "maximum_use",
   "used",
+  "allowed_customer",
+  "allowed_customer_group",
   "column_break_11",
   "description",
-  "amended_from"
+  "amended_from",
+  "rules_section",
+  "brackets_widget",
+  "brackets_code"
  ],
  "fields": [
   {
@@ -58,13 +62,6 @@
    "no_copy": 1,
    "set_only_once": 1,
    "unique": 1
-  },
-  {
-   "fieldname": "pricing_rule",
-   "fieldtype": "Link",
-   "label": "Pricing Rule",
-   "options": "Pricing Rule",
-   "reqd": 1
   },
   {
    "fieldname": "uses",
@@ -113,10 +110,36 @@
    "options": "Coupon Code",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "rules_section",
+   "fieldtype": "Section Break",
+   "label": "Rules"
+  },
+  {
+   "fieldname": "brackets_widget",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "brackets_code",
+   "fieldtype": "Code",
+   "hidden": 1
+  },
+  {
+   "fieldname": "allowed_customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "allowed_customer_group",
+   "fieldtype": "Link",
+   "label": "Customer Group",
+   "options": "Customer Group"
   }
  ],
- "modified": "2019-10-19 14:48:14.602481",
- "modified_by": "Administrator",
+ "modified": "2020-12-17 00:02:05.148366",
+ "modified_by": "forellana@digithinkit.com",
  "module": "Accounts",
  "name": "Coupon Code",
  "owner": "Administrator",

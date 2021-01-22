@@ -8,6 +8,7 @@ from frappe import throw, _
 from frappe.utils.nestedset import NestedSet
 from erpnext.stock import get_warehouse_account
 from frappe.contacts.address_and_contact import load_address_and_contact
+import itertools
 
 class Warehouse(NestedSet):
 	nsm_parent_field = 'parent_warehouse'
@@ -32,6 +33,36 @@ class Warehouse(NestedSet):
 
 	def on_update(self):
 		self.update_nsm_model()
+		self.create_warehouse_address()
+		self.create_warehouse_contact()
+
+	def create_warehouse_address(self):
+		if self.customer:
+			address_names = frappe.get_all('Dynamic Link', filters={
+				"parenttype": "Address",
+				"link_doctype": "Customer",
+				"link_name": self.customer
+			}, fields=["parent as name"])
+
+			for address_name in address_names:
+				address = frappe.get_doc('Address', address_name.get('name'))
+				if not address.has_link('Warehouse', self.name):
+					address.append('links', dict(link_doctype='Warehouse', link_name=self.name))
+					address.save()
+
+	def create_warehouse_contact(self):
+		if self.customer:
+			contact_names = frappe.get_all('Dynamic Link', filters={
+				"parenttype": "Contact",
+				"link_doctype": "Customer",
+				"link_name": self.customer
+			}, fields=["parent as name"])
+
+			for contact_name in contact_names:
+				contact = frappe.get_doc('Contact', contact_name.get('name'))
+				if not contact.has_link('Warehouse', self.name):
+					contact.append('links', dict(link_doctype='Warehouse', link_name=self.name))
+					contact.save()
 
 	def update_nsm_model(self):
 		frappe.utils.nestedset.update_nsm(self)
@@ -200,3 +231,57 @@ def get_warehouses_based_on_account(account, company=None):
 			.format(account))
 
 	return warehouses
+
+def get_warehouse_list(doctype, txt, filters, limit_start, limit_page_length=20, order_by="`tabWarehouse`.modified"):
+	"""Getting list of warehouse and there items details from Warehouse and Bin doctype."""
+	customers_list = frappe.db.sql("""
+		SELECT `tabDynamic Link`.link_name
+		FROM `tabContact`
+			LEFT JOIN `tabDynamic Link`
+				ON `tabContact`.name=`tabDynamic Link`.parent
+		WHERE `tabContact`.email_id='%(email_id)s'
+			AND `tabDynamic Link`.link_doctype='Customer'
+	""" % {
+		"email_id": frappe.session.user
+	}, as_list=True)
+
+	customers = list(itertools.chain.from_iterable(customers_list))
+
+	warehouses_list = frappe.db.sql("""
+		SELECT `tabBin`.*, `tabItem`.item_name
+		FROM `tabBin`
+			LEFT JOIN `tabWarehouse`
+				ON `tabWarehouse`.name=`tabBin`.warehouse
+				LEFT JOIN `tabItem`
+					ON `tabBin`.item_code=`tabItem`.name
+		WHERE `tabWarehouse`.published=1
+			AND `tabWarehouse`.customer IN %(customers)s
+		ORDER BY %(order_by)s
+		LIMIT %(start)s, %(page_len)s
+	""", {
+		"customers": list(itertools.chain.from_iterable(customers_list)),
+		"order_by": order_by,
+		"start": limit_start,
+		"page_len": limit_page_length
+	}, as_dict=True)
+
+	return warehouses_list
+
+def get_list_context(context=None):
+	"""
+	Passing values to the webpage.
+
+	Args:
+		context (json, optional): Defaults to None.
+
+	Returns:
+		json: returns data to the path of row_template.
+	"""
+	return {
+		"show_sidebar": True,
+		"show_search": True,
+		'no_breadcrumbs': True,
+		"title": _("Warehouse"),
+		"get_list": get_warehouse_list,
+		"row_template": "stock/doctype/warehouse/templates/warehouse_row.html",
+	}

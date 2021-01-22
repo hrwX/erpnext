@@ -28,7 +28,8 @@
   "base_total",
   "base_tax_amount_after_discount_amount",
   "item_wise_tax_detail",
-  "parenttype"
+  "parenttype",
+  "automation_data"
  ],
  "fields": [
   {
@@ -210,12 +211,19 @@
    "label": "Add or Deduct",
    "options": "Add\nDeduct",
    "reqd": 1
+  },
+  {
+    "fieldname": "automation_data",
+    "fieldtype": "Code",
+    "label": "Automation Data",
+    "hidden": 1,
+    "print_hide": 1
   }
  ],
  "idx": 1,
  "istable": 1,
  "links": [],
- "modified": "2020-05-19 03:31:26.950640",
+ "modified": "2020-12-09 03:31:26.950640",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Sales Taxes and Charges",

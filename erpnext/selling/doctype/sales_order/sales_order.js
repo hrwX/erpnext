@@ -79,9 +79,6 @@ frappe.ui.form.on("Sales Order", {
 		if (!frm.doc.transaction_date){
 			frm.set_value('transaction_date', frappe.datetime.get_today())
 		}
-		erpnext.queries.setup_queries(frm, "Warehouse", function() {
-			return erpnext.queries.warehouse(frm.doc);
-		});
 
 		frm.set_query('project', function(doc, cdt, cdn) {
 			return {
@@ -106,24 +103,28 @@ frappe.ui.form.on("Sales Order", {
 frappe.ui.form.on("Sales Order Item", {
 	item_code: function(frm,cdt,cdn) {
 		var row = locals[cdt][cdn];
+
 		if (frm.doc.delivery_date) {
 			row.delivery_date = frm.doc.delivery_date;
 			refresh_field("delivery_date", cdn, "items");
 		} else {
 			frm.script_manager.copy_from_first_row("items", row, ["delivery_date"]);
 		}
-		frappe.call({
-			method: "erpnext.selling.doctype.sales_order.sales_order.get_customer_item_ref_code",
-			args: {	
-				'item': frm.doc.items[0].item_code,
-				'customer_name': frm.doc.customer
-			},		
-			callback: function(r) {
-				if (r.message){				
-					frappe.model.set_value(cdt, cdn, "customer_item_code", r.message);				
+
+		if (frm.doc.customer && row.item_code) {
+			frappe.call({
+				method: "erpnext.selling.doctype.sales_order.sales_order.get_customer_item_ref_code",
+				args: {
+					'item': row.item_code,
+					'customer_name': frm.doc.customer
+				},
+				callback: function(r) {
+					if (r && r.message){
+						frappe.model.set_value(cdt, cdn, "customer_item_code", r.message);
+					}
 				}
-			}
-		});
+			});
+		}
 	},
 	delivery_date: function(frm, cdt, cdn) {
 		if(!frm.doc.delivery_date) {

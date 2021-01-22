@@ -8,6 +8,7 @@ from frappe.utils import flt, cint, nowdate
 
 from frappe import throw, _
 import frappe.defaults
+import json
 from frappe.utils import getdate
 from erpnext.controllers.buying_controller import BuyingController
 from erpnext.accounts.utils import get_account_currency
@@ -16,6 +17,8 @@ from frappe.model.mapper import get_mapped_doc
 from erpnext.buying.utils import check_on_hold_or_closed_status
 from erpnext.assets.doctype.asset.asset import get_asset_account, is_cwip_accounting_enabled
 from erpnext.assets.doctype.asset_category.asset_category import get_asset_category_account
+from erpnext.manufacturing.doctype.production_plan.production_plan import update_per_received_in_production_plan
+from erpnext.selling.doctype.sales_order.sales_order import get_default_bom_item
 from six import iteritems
 
 form_grid_templates = {
@@ -52,17 +55,6 @@ class PurchaseReceipt(BuyingController):
 			'target_ref_field': 'stock_qty',
 			'source_field': 'stock_qty',
 			'percent_join_field': 'material_request'
-		},
-		{
-			'source_dt': 'Purchase Receipt Item',
-			'target_dt': 'Production Plan Item',
-			'join_field': 'production_plan_item',
-			'target_field': 'received_qty',
-			'target_parent_dt': 'Production Plan',
-			'target_parent_field': 'per_received',
-			'target_ref_field': 'received_qty',
-			'source_field': 'received_qty',
-			'percent_join_field': 'production_plan'
 		}]
 		if cint(self.is_return):
 			self.status_updater.append({
@@ -180,6 +172,8 @@ class PurchaseReceipt(BuyingController):
 
 		self.make_gl_entries()
 		self.update_package_tag_batch()
+		update_per_received_in_production_plan(self)
+
 
 	def before_cancel(self):
 		self.update_package_tag_batch(reset=True)
@@ -212,6 +206,7 @@ class PurchaseReceipt(BuyingController):
 		self.update_stock_ledger()
 		self.make_gl_entries_on_cancel()
 		self.delete_auto_created_batches()
+		update_per_received_in_production_plan(self)
 
 	def get_current_stock(self):
 		for d in self.get('supplied_items'):
@@ -513,6 +508,46 @@ class PurchaseReceipt(BuyingController):
 			duplicate_tags = list(set([tag for tag in package_tags if package_tags.count(tag) > 1]))
 			frappe.throw("Package Tag(s) {0} cannot be same for multiple items".format(", ".join(duplicate_tags)))
 
+	def get_work_order_items(self, for_raw_material_request=0):
+		'''Returns items with BOM that already do not have a linked work order'''
+
+		items = []
+
+		for table in [self.items, self.supplied_items]:
+			for row in table:
+				bom = get_default_bom_item(row.item_code)
+				if not bom:
+					continue
+				
+				stock_qty = row.consumed_qty if row.doctype == 'Purchase Receipt Item Supplied' else row.stock_qty
+				pending_qty = stock_qty
+				if not for_raw_material_request:
+					total_work_order_qty = frappe.get_all("Work Order",
+						filters={
+							"production_item": row.item_code,
+							"purchase_receipt": self.name,
+							"purchase_receipt_item": row.name,
+							"docstatus": ["<", 2]
+						},
+						fields=["sum(qty) as qty"])
+
+					if total_work_order_qty:
+						pending_qty -= flt(total_work_order_qty[0].qty)
+
+				if pending_qty and row.item_code:
+					items.append({
+						"name": row.name,
+						"item_code": row.item_code,
+						"description": row.description,
+						"bom": bom,
+						"warehouse": row.warehouse,
+						"pending_qty": pending_qty,
+						"required_qty": pending_qty if for_raw_material_request else 0,
+						"purchase_receipt_item": row.name
+					})
+
+		return items
+
 
 def update_billed_amount_based_on_po(po_detail, update_modified=True):
 	# Billed against Sales Order directly
@@ -772,3 +807,34 @@ def make_production_plan(source_name, target_doc=None):
 		}
 	}, target_doc)
 	return doc
+
+@frappe.whitelist()
+def make_work_orders(items, purchase_receipt, company, project=None):
+	'''Make Work Orders against the given Sales Order for the given `items`'''
+	items = json.loads(items).get('items')
+	out = []
+
+	for i in items:
+		if not i.get("bom"):
+			frappe.throw(_("Please select BOM against item {0}").format(i.get("item_code")))
+		if not i.get("pending_qty"):
+			frappe.throw(_("Please select Qty against item {0}").format(i.get("item_code")))
+
+		work_order = frappe.get_doc(dict(
+			doctype='Work Order',
+			production_item=i['item_code'],
+			bom_no=i.get('bom'),
+			manufacturing_type="Process",
+			raw_material_qty=i['pending_qty'],
+			company=company,
+			purchase_receipt=purchase_receipt,
+			purchase_receipt_item=i['purchase_receipt_item'],
+			project=project,
+			fg_warehouse=i['warehouse'],
+			description=i['description']
+		)).insert()
+		work_order.set_work_order_operations()
+		work_order.save()
+		out.append(work_order)
+
+	return [p.name for p in out]

@@ -13,14 +13,22 @@ from frappe.utils.csvutils import build_csv_response
 from erpnext.manufacturing.doctype.bom.bom import validate_bom_no, get_children
 from erpnext.manufacturing.doctype.work_order.work_order import get_item_details
 from erpnext.setup.doctype.item_group.item_group import get_item_group_defaults
+from erpnext.stock.doctype.item.item import get_uom_conv_factor
 
 class ProductionPlan(Document):
 	def validate(self):
 		self.calculate_total_planned_qty()
 		self.set_status()
+		item_list = []
 		for d in self.get('po_items'):
-			if not d.bom_no:
-				frappe.throw(_("Row {0}: Please select default BOM for Item {1} ".format(d.idx, d.item_code)))
+			bom = frappe.db.get_values("Item", d.item_code, ["item_code","item_name", "default_bom"], as_dict=1)
+			item_list = item_list + bom
+
+		no_default_bom = ["""<a href="#Form/Item/{0}">{1}: {2}</a>""".format(m.item_code, m.item_code, m.item_name) \
+			for m in item_list if not m.default_bom]
+
+		if len(no_default_bom) >= 1:
+			frappe.throw(_("Please Set Default <b>BOM</b> for Item(s): <ol><li>{0}</li></ol>".format('<li>'.join(no_default_bom))))
 
 	def validate_data(self):
 		for d in self.get('po_items'):
@@ -206,6 +214,17 @@ class ProductionPlan(Document):
 		self.set_status()
 		self.db_set('status', self.status)
 
+	def update_produced_qty_in_mr_item(self, produced_qty, material_request_plan_item):
+		for data in self.mr_items:
+			if data.name == material_request_plan_item:
+				data.produced_qty = produced_qty
+				data.db_update()
+
+		self.calculate_total_produced_qty()
+		self.set_status()
+		self.db_set('status', self.status)
+		update_status_for_production_plan(self.name)
+
 	def on_cancel(self):
 		self.db_set('status', 'Cancelled')
 		self.delete_draft_work_order()
@@ -221,9 +240,6 @@ class ProductionPlan(Document):
 			1: 'Submitted',
 			2: 'Cancelled'
 		}.get(self.docstatus)
-
-		if self.docstatus == 1 and self.per_received == 100:
-			self.db_set("status", "Material Received")
 
 		if self.total_produced_qty > 0:
 			self.status = "In Process"
@@ -383,10 +399,19 @@ class ProductionPlan(Document):
 				"customer": item_doc.customer or ''
 			})
 
+			if item_doc.min_order_qty and item.quantity < item_doc.min_order_qty:
+				frappe.msgprint(_("Order Quantity is set to <b>{0}</b> as Minimum Order Qty for Item <b>{1}</b> is <b>{2}</b>").format(item_doc.min_order_qty, item_doc.item_code, item_doc.min_order_qty))
+				item.quantity = item_doc.min_order_qty
+
+			conversion_factor = get_uom_conv_factor(item_doc.purchase_uom, item_doc.stock_uom)
+			if conversion_factor:
+				item.quantity = item.quantity * conversion_factor
+
 			# add item
 			material_request_doc.append("items", {
 				"item_code": item.item_code,
 				"qty": item.quantity,
+				"rate": item_doc.last_purchase_rate,
 				"schedule_date": schedule_date,
 				"warehouse": item.warehouse,
 				"sales_order": item.sales_order,
@@ -400,10 +425,7 @@ class ProductionPlan(Document):
 			material_request_doc.run_method("set_missing_values")
 			material_request_doc.flags.ignore_permissions = 1
 			material_request_list.append(material_request_doc)
-			if self.get('submit_material_request'):
-				material_request_doc.submit()
-			else:
-				material_request_doc.save()
+			material_request_doc.save()
 
 		frappe.flags.mute_messages = False
 
@@ -411,6 +433,7 @@ class ProductionPlan(Document):
 			material_request_list = ["""<a href="#Form/Material Request/{0}">{1}</a>""".format(m.name, m.name) \
 				for m in material_request_list]
 			msgprint(_("{0} created").format(comma_and(material_request_list)))
+			self.db_set("status", "Material Requested")
 		else :
 			msgprint(_("No material request created"))
 
@@ -743,3 +766,52 @@ def get_sub_assembly_items(bom_no, bom_data):
 			bom_item["stock_qty"] += d.stock_qty / d.parent_bom_qty
 
 			get_sub_assembly_items(bom_item.get("bom_no"), bom_data)
+
+@frappe.whitelist()
+def update_per_received_in_production_plan(purchase_receipt):
+	"""
+	Set Percentage Received(per_received) in Material Request Plan Item.
+
+	Args:
+		purchase_receipt (dict): Purchase Receipt items for which Production Plan is updated
+	"""
+	for pr_item in purchase_receipt.items:
+		if not pr_item.production_plan:
+			return
+		production_plan = frappe.get_doc("Production Plan", pr_item.production_plan)
+		frappe.db.set_value("Material Request Plan Item", pr_item.material_request_plan_item, "received_qty", pr_item.received_qty)
+		frappe.db.set_value("Material Request Plan Item", pr_item.material_request_plan_item, "stock_qty", pr_item.stock_qty)
+		production_plan.reload()
+		if purchase_receipt.docstatus == 2:
+			for item in production_plan.mr_items:
+				if item.received_qty and item.requested_qty and pr_item.material_request_plan_item == item.name:
+					frappe.db.set_value("Material Request Plan Item", item.name, "received_qty", "0")
+					frappe.db.set_value("Material Request Plan Item", item.name, "requested_qty", "0")
+					frappe.db.set_value("Material Request Plan Item", item.name, "stock_qty", "0")
+					frappe.db.set_value("Material Request Plan Item", item.name, "per_received", "0")
+					production_plan.reload()
+			production_plan.db_set("status", "Material Requested")
+		else:
+			for mr_item in production_plan.mr_items:
+				if mr_item.received_qty and mr_item.requested_qty:
+					per_received = (mr_item.received_qty / mr_item.requested_qty) * 100
+					frappe.db.set_value("Material Request Plan Item", mr_item.name, "per_received", per_received)
+					production_plan.reload()
+
+	update_status_for_production_plan(production_plan.name)
+
+def update_status_for_production_plan(production_plan):
+	"""
+	Set status for production plan on the basis of material requests.
+
+	Args:
+		production_plan (string): Production Plan name
+	"""	
+	production_plan = frappe.get_doc("Production Plan", production_plan)
+	all_received = [item.per_received for item in production_plan.mr_items if item.material_request_type == "Purchase"]
+	produced_qty = [item.produced_qty for item in production_plan.mr_items if item.material_request_type == "Manufacture" and item.requested_qty == item.produced_qty]
+	status_set = all_received + produced_qty
+	if all(status_set):
+		production_plan.db_set("status", "Material Received")
+	elif any(status_set):
+		production_plan.db_set("status", "Partially Received")

@@ -519,10 +519,6 @@ frappe.ui.form.on("Purchase Invoice", {
 				frm.set_df_property("apply_tds", "read_only", 1);
 			}
 		}
-
-		erpnext.queries.setup_queries(frm, "Warehouse", function() {
-			return erpnext.queries.warehouse(frm.doc);
-		});
 	},
 
 	is_subcontracted: function(frm) {

@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
  "creation": "2017-05-29 21:35:13.136357",
@@ -22,6 +21,7 @@
   "party",
   "account_details_section",
   "iban",
+  "routing",
   "column_break_12",
   "bank_account_no",
   "branch_code",
@@ -210,10 +210,14 @@
    "fieldtype": "Data",
    "label": "Mask",
    "read_only": 1
+  },
+  {
+   "fieldname": "routing",
+   "fieldtype": "Data",
+   "label": "Routing"
   }
  ],
- "links": [],
- "modified": "2020-01-29 20:42:26.458316",
+ "modified": "2020-12-27 22:56:46.631021",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Bank Account",

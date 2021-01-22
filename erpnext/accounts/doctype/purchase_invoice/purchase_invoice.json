@@ -10,14 +10,16 @@
   "naming_series",
   "supplier",
   "supplier_name",
+  "bill_no",
+  "bill_date",
   "tax_id",
-  "due_date",
   "is_paid",
   "is_return",
   "apply_tds",
   "tax_withholding_category",
   "column_break1",
   "company",
+  "due_date",
   "posting_date",
   "posting_time",
   "set_posting_time",
@@ -30,10 +32,6 @@
   "release_date",
   "cb_17",
   "hold_comment",
-  "supplier_invoice_details",
-  "bill_no",
-  "column_break_15",
-  "bill_date",
   "returns",
   "return_against",
   "section_addresses",
@@ -192,6 +190,7 @@
    "oldfieldtype": "Link",
    "options": "Supplier",
    "print_hide": 1,
+   "reqd": 1,
    "search_index": 1
   },
   {
@@ -256,7 +255,8 @@
    "label": "Company",
    "options": "Company",
    "print_hide": 1,
-   "remember_last_selected_value": 1
+   "remember_last_selected_value": 1,
+   "reqd": 1
   },
   {
    "fieldname": "cost_center",
@@ -336,23 +336,12 @@
    "label": "Reason For Putting On Hold"
   },
   {
-   "collapsible": 1,
-   "collapsible_depends_on": "bill_no",
-   "fieldname": "supplier_invoice_details",
-   "fieldtype": "Section Break",
-   "label": "Supplier Invoice Details"
-  },
-  {
    "fieldname": "bill_no",
    "fieldtype": "Data",
    "label": "Supplier Invoice No",
    "oldfieldname": "bill_no",
    "oldfieldtype": "Data",
    "print_hide": 1
-  },
-  {
-   "fieldname": "column_break_15",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "bill_date",
@@ -1317,7 +1306,7 @@
  "icon": "fa fa-file-text",
  "idx": 204,
  "is_submittable": 1,
- "modified": "2020-12-07 02:12:45.460411",
+ "modified": "2021-01-19 03:12:20.087537",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Purchase Invoice",

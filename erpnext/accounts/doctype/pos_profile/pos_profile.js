@@ -3,31 +3,16 @@
 
 {% include "erpnext/public/js/controllers/accounts.js" %}
 
-frappe.ui.form.on("POS Profile", "onload", function(frm) {
-	frm.set_query("selling_price_list", function() {
-		return { filters: { selling: 1 } };
-	});
-
-	frm.set_query("tc_name", function() {
-		return { filters: { selling: 1 } };
-	});
-
-	erpnext.queries.setup_queries(frm, "Warehouse", function() {
-		return erpnext.queries.warehouse(frm.doc);
-	});
-
-	frm.call({
-		method: "erpnext.accounts.doctype.pos_profile.pos_profile.get_series",
-		callback: function(r) {
-			if(!r.exc) {
-				set_field_options("naming_series", r.message);
-			}
-		}
-	});
-});
-
 frappe.ui.form.on('POS Profile', {
 	setup: function(frm) {
+		frm.set_query("selling_price_list", function() {
+			return { filters: { selling: 1 } };
+		});
+
+		frm.set_query("tc_name", function() {
+			return { filters: { selling: 1 } };
+		});
+
 		frm.set_query("print_format_for_online", function() {
 			return {
 				filters: [
@@ -67,6 +52,21 @@ frappe.ui.form.on('POS Profile', {
 					link_name: doc.company
 				}
 			};
+		});
+
+		erpnext.queries.setup_queries(frm, "Warehouse", function() {
+			return erpnext.queries.warehouse(frm.doc);
+		});
+	},
+
+	onload: function(frm) {
+		frm.call({
+			method: "erpnext.accounts.doctype.pos_profile.pos_profile.get_series",
+			callback: function(r) {
+				if(!r.exc) {
+					set_field_options("naming_series", r.message);
+				}
+			}
 		});
 	},
 

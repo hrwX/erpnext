@@ -1,0 +1,61 @@
+{
+ "creation": "2020-11-22 21:57:46.119286",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "push_data",
+  "pull_data",
+  "pull_incoming_transfer",
+  "license_no"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "push_data",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Push Data"
+  },
+  {
+   "default": "0",
+   "fieldname": "pull_data",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Pull Data"
+  },
+  {
+   "default": "0",
+   "fieldname": "pull_incoming_transfer",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Pull Incoming Transfer"
+  },
+  {
+   "fieldname": "license_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "License No"
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-11-22 22:36:52.407285",
+ "modified_by": "Administrator",
+ "module": "Compliance",
+ "name": "Compliance Company",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

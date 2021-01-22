@@ -235,7 +235,7 @@ def get_data(company, root_type, balance_must_be, period_list, filters=None,
 		return None
 
 	#get list and map of parent/child accounts
-	accounts, accounts_by_name, parent_children_map = filter_accounts(accounts, root_type)
+	accounts, accounts_by_name, parent_children_map = filter_accounts(accounts)
 	company_currency = get_appropriate_currency(company, filters)
 	accounts = sort_accounts_by_key(accounts)
 	
@@ -561,13 +561,12 @@ def get_accounts(company, root_type):
 		where company=%s and root_type=%s order by lft""", (company, root_type), as_dict=True)
 
 
-def filter_accounts(accounts, root_type, depth=10):
+def filter_accounts(accounts, depth=10):
 	"""
 	Returns convenient data structures for processing of accounts.
 
 	Args:
 		accounts (list of dict): map of financial account details
-		root_type (string): the root account, i.e. Assets, Liabilities, etc
 		depth (int, optional): Depth of the leaf accounts in the accounts tree. Defaults to 10.
 
 	Returns:

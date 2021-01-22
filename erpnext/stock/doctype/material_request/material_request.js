@@ -32,11 +32,6 @@ frappe.ui.form.on('Material Request', {
 
 		// set schedule_date
 		set_schedule_date(frm);
-		frm.fields_dict["items"].grid.get_field("warehouse").get_query = function (doc) {
-			return {
-				filters: { 'company': doc.company }
-			};
-		};
 	},
 
 	onload_post_render: function (frm) {
@@ -239,30 +234,102 @@ frappe.ui.form.on('Material Request', {
 	},
 
 	make_purchase_order: function (frm) {
-		frappe.prompt(
-			{
-				label: __('For Default Supplier (Optional)'),
-				fieldname: 'default_supplier',
-				fieldtype: 'Link',
-				options: 'Supplier',
-				description: __('Select a Supplier from the Default Supplier List of the items below.'),
-				get_query: () => {
-					return {
-						query: "erpnext.stock.doctype.material_request.material_request.get_default_supplier_query",
-						filters: { 'doc': frm.doc.name }
+		frappe.call({
+			method: 'erpnext.stock.doctype.item.item.get_supplier_for_purchase_order',
+			args: {
+				'items': frm.doc.items
+			},
+		callback: function(r) {
+			const dialog = new frappe.ui.Dialog({
+				title: __("Make Purchase Order"),
+				fields:[{
+					label: __("Items"),
+					fieldname: "items",
+					fieldtype: "Table",
+					data: r.message,
+					cannot_add_rows: true,
+					in_place_edit: true,
+					get_data: () => {
+						return r.message
+					},
+					fields: [
+						{
+							label: __("Supplier"),
+							fieldtype: 'Link',
+							fieldname: "supplier",
+							options: "Supplier",
+							in_list_view: 1,
+							get_query: () => {
+								return {
+									query: "erpnext.stock.doctype.material_request.material_request.get_suppliers",
+									filters: { 'doc': frm.doc.name }
+								}
+							},
+							change: () => {
+								frm.events.set_dialog_value(dialog, frm)
+							}
+						},
+						{
+							label: __("Rate"),
+							fieldtype: 'Currency',
+							fieldname: "price_list_rate",
+							read_only: true,
+							in_list_view: 1,
+						},
+						{
+							label: __("UOM"),
+							fieldtype: 'Link',
+							fieldname: "uom",
+							options: "UOM",
+							read_only: true,
+							in_list_view: 1,
+						},
+					]
+				}],
+				primary_action: function() {
+					const items = dialog.get_values().items;
+					items.forEach(item => {
+						frappe.model.open_mapped_doc({
+							method: "erpnext.stock.doctype.material_request.material_request.make_purchase_order",
+							frm: frm,
+							args: { 
+								default_supplier: item.supplier,
+								price_list_rate: item.price_list_rate,
+								uom: item.uom
+							 },
+							run_link_triggers: true
+						});
+					})
+					dialog.hide()
+				},
+				primary_action_label: __('Create')
+			})
+			dialog.show()
+		}
+	})
+	},
+	
+	set_dialog_value: function(dialog, frm) {
+		dialog.fields_dict.items.grid.grid_rows.forEach(item => {
+			let supplier = item.on_grid_fields_dict.supplier.get_value();
+			frappe.call({
+				'method': "erpnext.stock.doctype.material_request.material_request.get_rate",
+				'args': {
+					'doc': frm.doc.name,
+					'supplier': supplier
+				},
+				callback: function(r) {
+					if (r.message) {
+						r.message.forEach(data => {
+							if (data.supplier == supplier) {
+								item.on_grid_fields_dict.price_list_rate.set_value(data.price_list_rate)
+								item.on_grid_fields_dict.uom.set_value(data.uom)
+							}
+						})
 					}
 				}
-			},
-			(values) => {
-				frappe.model.open_mapped_doc({
-					method: "erpnext.stock.doctype.material_request.material_request.make_purchase_order",
-					frm: frm,
-					args: { default_supplier: values.default_supplier },
-					run_link_triggers: true
-				});
-			},
-			__('Enter Supplier')
-		)
+			})
+		})
 	},
 
 	make_request_for_quotation: function (frm) {

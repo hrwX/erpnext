@@ -9,6 +9,7 @@
   "stock_uom",
   "default_warehouse",
   "sample_retention_warehouse",
+  "no_of_days_to_calculate_avg_manufactured_qty",
   "column_break_4",
   "valuation_method",
   "over_delivery_receipt_allowance",
@@ -210,12 +211,18 @@
    "fieldname": "disable_cannabis_taxes_calculation",
    "fieldtype": "Check",
    "label": "Disable Cannabis Taxes Calculation"
+  },
+  {
+   "description": "Gather all Manufacture stock entries for the Work Order, created in a specified number of days, and update the required Average Manufactured Quantity in the BOM (based on the Moving Average method).\nIf not specified will calculate for the past 7 days.",
+   "fieldname": "no_of_days_to_calculate_avg_manufactured_qty",
+   "fieldtype": "Int",
+   "label": "Number of Days (Past) to Calculate Average Manufactured Quantity "
   }
  ],
  "icon": "icon-cog",
  "idx": 1,
  "issingle": 1,
- "modified": "2020-11-04 01:13:11.094570",
+ "modified": "2021-01-11 22:18:52.695070",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Stock Settings",

@@ -21,6 +21,9 @@ frappe.ui.form.on('Clinical Procedure', {
 				};
 			}
 		});
+		erpnext.queries.setup_queries(frm, "Warehouse", function() {
+			return erpnext.queries.warehouse(frm.doc);
+		});
 	},
 	refresh: function(frm) {
 		frm.set_query("patient", function () {
